@@ -56,13 +56,19 @@ export default async function Home({ searchParams }: { searchParams: { disciplin
     const keyword = "soccer,football";
     const defaultImg = `https://loremflickr.com/800/600/${keyword}?lock=${n.id || Math.floor(Math.random() * 100)}`;
 
+    // Limpiar imágenes defectuosas de Google News
+    let finalImg = n.imagen_url || n.img || defaultImg;
+    if (finalImg && (finalImg.includes("googleusercontent") || finalImg.includes("gstatic") || finalImg.includes("news.google.com") || finalImg === "https://news.google.com/rss")) {
+        finalImg = defaultImg;
+    }
+
     return {
       id: n.id,
-      title: n.title || n.titulo || "Sin título",
+      title: n.title || n.titulo || "",
       category: category,
       time: n.time || n.fecha || "",
       link: n.link,
-      img: n.imagen_url || n.img || defaultImg
+      img: finalImg
     };
   });
 
@@ -89,7 +95,7 @@ export default async function Home({ searchParams }: { searchParams: { disciplin
               </div>
               <div className="flex justify-between items-center">
                 <span className="font-semibold text-lg dark:text-white">{match.teamB}</span>
-                <span className="text-2xl font-black text-blue-600 dark:text-blue-400">{match.score || 'vs'}</span>
+                <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{match.score || 'vs'}</span>
               </div>
             </div>
           ))}
