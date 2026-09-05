@@ -33,6 +33,8 @@ def ingest_espn_feed(db: Session):
         "https://www.skysports.com/rss/12040",
         "https://www.france24.com/fr/sports/rss", # Reemplazo funcional para L'Equipe
         "http://feeds.bbci.co.uk/sport/rss.xml",  # Reemplazo funcional para The Athletic UK
+        "https://sport.sky.it/rss/sport.xml",     # Sky Sport (Italia) - Nuevo
+        "https://rss.kicker.de/news/aktuell",     # Kicker (Alemania) - Nuevo
         # Basquet / NBA
         "https://www.espn.com/espn/rss/nba/news",
         "https://e00-marca.uecdn.es/rss/baloncesto/nba.xml",
