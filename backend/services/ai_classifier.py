@@ -29,33 +29,44 @@ def parse_and_clean_json(content: str, titulo: str, resumen: str) -> dict:
         # Si la IA respondió texto basura que no es JSON, enviarlo al fallback manual
         raise Exception("El formato devuelto no es un JSON válido")
 
+import re
+
 def fallback_reglas(titulo: str, resumen: str) -> dict:
     """Intento 5: Sistema de rescate absoluto sin Inteligencia Artificial"""
     texto = (titulo + " " + resumen).lower()
     palabras_clave = {
-        "Tenis": ["tenis", "atp", "alcaraz", "wimbledon", "djokovic", "grand slam", "nadal", "federer"],
-        "Básquetbol": ["nba", "básquet", "lakers", "campazzo", "lebron", "jordan", "fiba", "celtics"],
-        "Rugby": ["rugby", "pumas", "all blacks", "scrum", "try", "seis naciones"],
-        "Fórmula 1": ["f1", "fórmula 1", "colapinto", "verstappen", "hamilton", "ferrari", "gran premio", "fia"],
-        "Hockey": ["hockey", "leonas", "leones"],
-        "Vóley": ["vóley", "voleibol", "de cecco"],
-        "Boxeo": ["boxeo", "ring", "ko", "canelo"],
-        "Fútbol": ["fútbol", "flamengo", "gol", "messi", "maradona", "libertadores", "champions", "selección", "ajax"]
+        "La Liga": ["real madrid", "barcelona", "atlético madrid", "sevilla", "betis", "la liga", "españa", "mbappé", "vinicius", "yamal", "athletic"],
+        "Premier League": ["manchester", "arsenal", "chelsea", "liverpool", "tottenham", "premier", "inglaterra", "aston villa", "city", "haaland"],
+        "Serie A": ["juventus", "milan", "inter", "napoli", "roma", "serie a", "italia", "lazio", "fiorentina"],
+        "Bundesliga": ["bayern", "dortmund", "leverkusen", "leipzig", "bundesliga", "alemania", "stuttgart"],
+        "Ligue 1": ["psg", "marseille", "lyon", "monaco", "ligue 1", "francia", "paris saint-germain"],
+        "Liga Argentina": ["boca", "river", "racing", "independiente", "san lorenzo", "argentina", "lpf", "liga profesional", "velez", "talleres", "estudiantes"],
+        "Brasileirão": ["flamengo", "palmeiras", "sao paulo", "corinthians", "brasileirao", "brasil", "fluminense", "gremio", "botafogo", "atletico mineiro"],
+        "Primeira Liga": ["benfica", "porto", "sporting", "primeira liga", "portugal", "braga"],
+        "MLS": ["inter miami", "galaxy", "mls", "estados unidos", "usa", "messi"],
+        "Eredivisie": ["ajax", "psv", "feyenoord", "eredivisie", "paises bajos", "holanda"],
+        "Liga MX": ["america", "chivas", "cruz azul", "pumas", "tigres", "monterrey", "liga mx", "mexico"]
     }
-    for deporte, keywords in palabras_clave.items():
-        if any(kw in texto for kw in keywords):
-            return {"disciplina": deporte, "confianza": "medio", "titulo_es": titulo, "resumen_es": resumen}
-    return {"disciplina": "Otro", "confianza": "bajo", "titulo_es": titulo, "resumen_es": resumen}
+    for liga, keywords in palabras_clave.items():
+        for kw in keywords:
+            if re.search(r'\b' + re.escape(kw) + r'\b', texto):
+                return {"disciplina": liga, "confianza": "medio", "titulo_es": titulo, "resumen_es": resumen}
+    return {"disciplina": "Fútbol Internacional", "confianza": "bajo", "titulo_es": titulo, "resumen_es": resumen}
 
 
 def classify_news(titulo: str, resumen: str) -> dict:
-    prompt = f"""Eres un asistente experto en deportes y traducción. Analiza la siguiente noticia:
-1. Clasifícala en UNA de estas disciplinas: Fútbol, Básquetbol, Tenis, Rugby, Fórmula 1, Atletismo, Boxeo, Natación, Ciclismo, Hockey, Vóley, u 'Otro'.
-2. Traduce el título y el resumen al Español neutro (si ya están en español, déjalos igual).
-Responde ÚNICAMENTE con un objeto JSON válido con los campos 'disciplina', 'confianza' (alto, medio, bajo), 'titulo_es' (título traducido) y 'resumen_es' (resumen traducido). No incluyas markdown.
-
-Título original: {titulo}
-Resumen original: {resumen}"""
+    prompt = f"""
+    Eres un periodista deportivo experto en fútbol mundial.
+    Dado el siguiente título y resumen de una noticia, identifica a cuál de estas ligas pertenece principalmente:
+    La Liga, Premier League, Serie A, Bundesliga, Ligue 1, Liga Argentina, Brasileirão, Primeira Liga, MLS, Eredivisie, Liga MX, o "Fútbol Internacional" si son selecciones o competiciones europeas generales (Champions, Mundial).
+    Traduce el título y el resumen al Español neutro si están en otro idioma.
+    
+    Responde ÚNICAMENTE con un objeto JSON válido con las claves: 'disciplina' (nombre exacto de la liga), 'confianza' (alto, medio, bajo), 'titulo_es' (traducido), y 'resumen_es' (traducido).
+    No agregues Markdown ni explicaciones.
+    
+    Título: {titulo}
+    Resumen: {resumen}
+    """
     
     # Intento 1: GROQ (Velocidad Extrema LPU)
     try:
