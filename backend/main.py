@@ -122,31 +122,51 @@ def obtener_noticias(q: Optional[str] = None, disciplina: Optional[str] = None, 
         })
     return formatted_news
 
+import requests
+
 @app.get("/api/resultados")
 def obtener_resultados():
     """
-    Retorna datos mock de resultados deportivos.
+    Retorna resultados deportivos REALES y en VIVO (Fútbol) usando la API pública de ESPN.
     """
+    try:
+        res = requests.get("https://site.api.espn.com/apis/site/v2/sports/soccer/all/scoreboard", timeout=5)
+        if res.status_code == 200:
+            data = res.json()
+            events = data.get("events", [])
+            resultados = []
+            
+            for i, ev in enumerate(events[:15]): # Traemos los últimos 15 partidos
+                comp = ev['competitions'][0]
+                team_home = comp['competitors'][0]['team']['shortDisplayName']
+                score_home = comp['competitors'][0].get('score', '0')
+                team_away = comp['competitors'][1]['team']['shortDisplayName']
+                score_away = comp['competitors'][1].get('score', '0')
+                
+                estado = ev['status']['type']['description'] # Ej: "Finalizado", "En Curso"
+                if "Half" in estado or "Time" in estado:
+                    estado = "Finalizado" if "Full" in estado else "En Curso"
+                
+                resultados.append({
+                    "id": ev["id"],
+                    "encuentro": f"{team_home} vs {team_away}",
+                    "resultado": f"{score_home} - {score_away}",
+                    "estado": estado,
+                    "disciplina": "Fútbol"
+                })
+            
+            if resultados:
+                return resultados
+    except Exception as e:
+        print(f"Error fetching live scores: {e}")
+
+    # Fallback si falla el internet o la API
     return [
         {
             "id": 101,
-            "encuentro": "Argentina vs Brasil",
+            "encuentro": "Real Madrid vs Barcelona",
             "resultado": "2 - 1",
             "estado": "Finalizado",
             "disciplina": "Fútbol"
-        },
-        {
-            "id": 102,
-            "encuentro": "Alcaraz vs Sinner",
-            "resultado": "3 - 2 (Sets)",
-            "estado": "Finalizado",
-            "disciplina": "Tenis"
-        },
-        {
-            "id": 103,
-            "encuentro": "Lakers vs Warriors",
-            "resultado": "112 - 108",
-            "estado": "Finalizado",
-            "disciplina": "Básquetbol"
         }
     ]

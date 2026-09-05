@@ -13,9 +13,11 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import ThemeToggle from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
-  title: "Maspot Deportes",
-  description: "Portal de deportes",
+  title: "Maspot Fútbol",
+  description: "Portal de fútbol mundial",
 };
+
+import Script from "next/script";
 
 export default function RootLayout({
   children,
@@ -24,6 +26,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
+      <head>
+        {/* Script global de Google AdSense */}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0000000000000000"
+          crossOrigin="anonymous"
+          strategy="lazyOnload"
+        />
+      </head>
       <body className={`${inter.className} bg-gray-100 dark:bg-gray-900 text-black dark:text-gray-100 flex h-screen overflow-hidden`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <Suspense fallback={<div className="w-64 bg-black h-full shrink-0"></div>}>

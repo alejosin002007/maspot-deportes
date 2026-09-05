@@ -27,26 +27,50 @@ from models import Noticia
 
 def ingest_espn_feed(db: Session):
     feed_urls = [
-        # Futbol & General
-        "https://www.ole.com.ar/rss/",
-        "https://as.com/rss/tags/ultimas_noticias.xml",
-        "https://www.skysports.com/rss/12040",
-        "https://www.france24.com/fr/sports/rss", # Reemplazo funcional para L'Equipe
-        "http://feeds.bbci.co.uk/sport/rss.xml",  # Reemplazo funcional para The Athletic UK
-        "https://sport.sky.it/rss/sport.xml",     # Sky Sport (Italia) - Nuevo
-        "https://rss.kicker.de/news/aktuell",     # Kicker (Alemania) - Nuevo
-        # Basquet / NBA
-        "https://www.espn.com/espn/rss/nba/news",
-        "https://e00-marca.uecdn.es/rss/baloncesto/nba.xml",
-        # Tenis
-        "https://e00-marca.uecdn.es/rss/tenis.xml",
-        # Motor
-        "https://e00-marca.uecdn.es/rss/motor/formula1.xml",
-        # Rugby
-        "https://www.espn.com/espn/rss/rugby/news",
-        # Hockey (fuentes argentinas sin imagen)
-        "https://hockeyargentinoplus.com.ar/feed/",
-        "https://solohockeyweb.com/feed/"
+        # La Liga (España)
+        "https://as.com/rss/futbol/primera.xml",
+        "https://e00-marca.uecdn.es/rss/futbol/primera-division.xml",
+        "https://www.sport.es/es/rss/barca/rss.xml",
+        
+        # Premier League (Inglaterra)
+        "https://www.skysports.com/rss/11661",
+        "http://feeds.bbci.co.uk/sport/football/premier-league/rss.xml",
+        "https://news.google.com/rss/search?q=Premier+League+football&hl=es-419&gl=AR&ceid=AR:es-419",
+        
+        # Serie A (Italia)
+        "https://sport.sky.it/rss/calcio/serie-a.xml",
+        "https://news.google.com/rss/search?q=Serie+A+calcio&hl=es-419&gl=AR&ceid=AR:es-419",
+        
+        # Bundesliga (Alemania)
+        "https://rss.kicker.de/news/bundesliga",
+        "https://news.google.com/rss/search?q=Bundesliga+fussball&hl=es-419&gl=AR&ceid=AR:es-419",
+        
+        # Ligue 1 (Francia)
+        "https://www.france24.com/fr/sports/rss",
+        "https://news.google.com/rss/search?q=Ligue+1+football+france&hl=es-419&gl=AR&ceid=AR:es-419",
+        
+        # Liga Argentina
+        "https://www.ole.com.ar/rss/futbol-primera/",
+        "https://www.tycsports.com/rss/liga-profesional-de-futbol.xml",
+        "https://www.espn.com.ar/espn/rss/futbol/argentina/news",
+        
+        # Brasileirão (Brasil)
+        "https://news.google.com/rss/search?q=Brasileirao+futebol&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+        "https://www.espn.com.br/espn/rss/futebol/news",
+        
+        # Primeira Liga (Portugal)
+        "https://news.google.com/rss/search?q=Primeira+Liga+futebol+Portugal&hl=pt-PT&gl=PT&ceid=PT:pt-150",
+        
+        # MLS (USA)
+        "https://www.espn.com/espn/rss/soccer/news",
+        "https://news.google.com/rss/search?q=MLS+soccer&hl=en-US&gl=US&ceid=US:en",
+        
+        # Eredivisie (Países Bajos)
+        "https://news.google.com/rss/search?q=Eredivisie+voetbal&hl=nl&gl=NL&ceid=NL:nl",
+        
+        # Liga MX (México)
+        "https://www.espn.com.mx/espn/rss/futbol/mexico/news",
+        "https://news.google.com/rss/search?q=Liga+MX+futbol&hl=es-419&gl=MX&ceid=MX:es-419"
     ]
     
     nuevas = 0
@@ -54,8 +78,8 @@ def ingest_espn_feed(db: Session):
     for feed_url in feed_urls:
         try:
             feed = feedparser.parse(feed_url)
-            # Process up to 5 items per feed to avoid overloading the API
-            for entry in feed.entries[:5]:
+            # Analizar las últimas 30 noticias de cada feed (antes eran solo 5)
+            for entry in feed.entries[:30]:
                 titulo = entry.get("title", "")
                 resumen = entry.get("summary", "")
                 link = entry.get("link", "")

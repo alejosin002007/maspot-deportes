@@ -1,4 +1,6 @@
 import NewsCard from "@/components/NewsCard";
+import AdBanner from "@/components/AdBanner";
+import React from "react";
 
 export const dynamic = 'force-dynamic';
 
@@ -51,16 +53,8 @@ export default async function Home({ searchParams }: { searchParams: { disciplin
     const catLower = category.toLowerCase();
     
     // Si la fuente RSS no trae imagen original, usamos loremflickr para inyectar una aleatoria (pero fija por id)
-    let keyword = "sports";
-    if (catLower.includes("hockey")) keyword = "fieldhockey";
-    else if (catLower.includes("rugby")) keyword = "rugby";
-    else if (catLower.includes("básquet") || catLower.includes("nba")) keyword = "basketball";
-    else if (catLower.includes("tenis")) keyword = "tennis";
-    else if (catLower.includes("fórmula") || catLower.includes("motor")) keyword = "formula1";
-    else if (catLower.includes("fútbol")) keyword = "soccer";
-
-    // Usamos el ID de la noticia para que siempre cargue la misma foto para la misma noticia
-    const defaultImg = `https://loremflickr.com/800/600/${keyword},sport?lock=${n.id || Math.floor(Math.random() * 100)}`;
+    const keyword = "soccer,football";
+    const defaultImg = `https://loremflickr.com/800/600/${keyword}?lock=${n.id || Math.floor(Math.random() * 100)}`;
 
     return {
       id: n.id,
@@ -106,9 +100,15 @@ export default async function Home({ searchParams }: { searchParams: { disciplin
       <section>
         <h2 className="text-2xl font-bold mb-8 dark:text-white">Últimas Noticias</h2>
         {news.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
-            {news.map((item: any) => (
-              <NewsCard key={item.id} item={item} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+            {news.map((item: any, index: number) => (
+              <React.Fragment key={item.id}>
+                {/* Inyectar un anuncio cada 6 noticias, comenzando después de la 3ra */}
+                {index > 0 && index % 6 === 3 && (
+                  <AdBanner dataAdSlot={`banner-${index}`} />
+                )}
+                <NewsCard item={item} />
+              </React.Fragment>
             ))}
           </div>
         ) : (
