@@ -2,6 +2,7 @@ import feedparser
 import sys
 import os
 import datetime
+import time
 import requests
 from bs4 import BeautifulSoup
 
@@ -27,6 +28,7 @@ from sqlalchemy.orm import Session
 from models import Noticia
 
 def ingest_espn_feed(db: Session):
+    # FUENTES DIRECTAS: NO SE USA GOOGLE NEWS COMO INTERMEDIARIO
     feeds_by_league = {
         "La Liga": [
             "https://as.com/rss/futbol/primera.xml",
@@ -35,20 +37,16 @@ def ingest_espn_feed(db: Session):
         ],
         "Premier League": [
             "https://www.skysports.com/rss/11661",
-            "http://feeds.bbci.co.uk/sport/football/premier-league/rss.xml",
-            "https://news.google.com/rss/search?q=Premier+League+football&hl=es-419&gl=AR&ceid=AR:es-419",
+            "http://feeds.bbci.co.uk/sport/football/premier-league/rss.xml"
         ],
         "Serie A": [
-            "https://sport.sky.it/rss/calcio/serie-a.xml",
-            "https://news.google.com/rss/search?q=Serie+A+calcio&hl=es-419&gl=AR&ceid=AR:es-419",
+            "https://sport.sky.it/rss/calcio/serie-a.xml"
         ],
         "Bundesliga": [
-            "https://rss.kicker.de/news/bundesliga",
-            "https://news.google.com/rss/search?q=Bundesliga+fussball&hl=es-419&gl=AR&ceid=AR:es-419",
+            "https://rss.kicker.de/news/bundesliga"
         ],
         "Ligue 1": [
-            "https://www.france24.com/fr/sports/rss",
-            "https://news.google.com/rss/search?q=Ligue+1+football+france&hl=es-419&gl=AR&ceid=AR:es-419",
+            "https://rmcsport.bfmtv.com/rss/football/ligue-1/"
         ],
         "Liga Argentina": [
             "https://www.ole.com.ar/rss/futbol-primera/",
@@ -56,33 +54,42 @@ def ingest_espn_feed(db: Session):
             "https://www.espn.com.ar/espn/rss/futbol/argentina/news",
         ],
         "Brasileirao": [
-            "https://news.google.com/rss/search?q=Brasileirao+futebol&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+            "https://ge.globo.com/rss/futebol/brasileirao-serie-a/",
             "https://www.espn.com.br/espn/rss/futebol/news",
         ],
         "Primeira Liga": [
-            "https://news.google.com/rss/search?q=Primeira+Liga+futebol+Portugal&hl=pt-PT&gl=PT&ceid=PT:pt-150",
+            "https://www.ojogo.pt/rss/futebol/1a-liga.xml"
         ],
         "MLS": [
             "https://www.espn.com/espn/rss/soccer/news",
-            "https://news.google.com/rss/search?q=MLS+soccer&hl=en-US&gl=US&ceid=US:en",
+            "https://sports.yahoo.com/soccer/rss/"
         ],
         "Eredivisie": [
-            "https://news.google.com/rss/search?q=Eredivisie+voetbal&hl=nl&gl=NL&ceid=NL:nl",
+            "https://www.voetbalprimeur.nl/rss/",
+            "https://www.telegraaf.nl/sport/voetbal/rss"
         ],
         "Liga MX": [
             "https://www.espn.com.mx/espn/rss/futbol/mexico/news",
-            "https://news.google.com/rss/search?q=Liga+MX+futbol&hl=es-419&gl=MX&ceid=MX:es-419"
         ]
     }
     
     nuevas = 0
+    now = time.time()
     
     for league, feed_urls in feeds_by_league.items():
         for feed_url in feed_urls:
             try:
                 feed = feedparser.parse(feed_url)
-                # Procesar las entradas (limitado a los 5 más recientes para agilizar la carga)
-                for entry in feed.entries[:5]:
+                # Procesar las entradas (limitado a los 8 más recientes para agilizar la carga)
+                for entry in feed.entries[:8]:
+                    
+                    # FILTRO DE FECHA ESTRICTO: NO NOTICIAS VIEJAS (> 7 dias)
+                    if hasattr(entry, 'published_parsed') and entry.published_parsed:
+                        entry_time = time.mktime(entry.published_parsed)
+                        days_old = (now - entry_time) / 86400
+                        if days_old > 7:
+                            continue # Ignorar noticias viejas
+
                     titulo = entry.get("title", "")
                     resumen = entry.get("summary", "")
                     link = entry.get("link", "")
@@ -97,8 +104,8 @@ def ingest_espn_feed(db: Session):
                                 imagen_url = l.get('href')
                                 break
                                 
-                    # Si el RSS no trae la imagen, o si es de Google News (para evitar redirecciones)
-                    if not imagen_url or "news.google.com" in link:
+                    # Si el RSS no trae la imagen, la resolvemos de la pagina
+                    if not imagen_url:
                         print(f"Resolviendo URL final e imagen para: {link}")
                         img_temp, link = resolve_url_and_image(link)
                         if not imagen_url:
