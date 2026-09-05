@@ -32,7 +32,6 @@ def ingest_espn_feed(db: Session):
     feeds_by_league = {
         "La Liga": [
             "https://as.com/rss/futbol/primera.xml",
-            "https://e00-marca.uecdn.es/rss/futbol/primera-division.xml",
             "https://www.sport.es/es/rss/barca/rss.xml",
         ],
         "Premier League": [
@@ -40,38 +39,29 @@ def ingest_espn_feed(db: Session):
             "http://feeds.bbci.co.uk/sport/football/premier-league/rss.xml"
         ],
         "Serie A": [
-            "https://e00-marca.uecdn.es/rss/futbol/liga-italiana.xml",
             "https://sport.sky.it/rss/calcio/serie-a.xml"
         ],
         "Bundesliga": [
             "https://rss.kicker.de/news/bundesliga",
-            "https://e00-marca.uecdn.es/rss/futbol/bundesliga.xml"
         ],
         "Ligue 1": [
-            "https://e00-marca.uecdn.es/rss/futbol/liga-francesa.xml",
             "https://rmcsport.bfmtv.com/rss/football/ligue-1/"
         ],
         "Liga Argentina": [
             "https://www.tycsports.com/rss/liga-profesional-de-futbol.xml",
-            "https://www.ole.com.ar/rss/futbol-primera/",
-            "https://e00-marca.uecdn.es/rss/futbol/futbol-america.xml"
+            "https://www.ole.com.ar/rss/futbol-primera/"
         ],
         "Brasileirao": [
-            "https://ge.globo.com/rss/futebol/brasileirao-serie-a/",
-            "https://www.espn.com.br/espn/rss/futebol/news",
+            "https://www.gazetaesportiva.com/campeonatos/brasileiro-serie-a/feed/"
         ],
         "Primeira Liga": [
-            "https://www.ojogo.pt/rss/futebol/1a-liga.xml"
+            "https://www.record.pt/rss"
         ],
         "MLS": [
-            "https://e00-marca.uecdn.es/rss/futbol/mls.xml",
+            "https://en.as.com/rss/soccer/mls.xml"
         ],
         "Eredivisie": [
-            "https://www.voetbalprimeur.nl/rss/",
-            "https://www.telegraaf.nl/sport/voetbal/rss"
-        ],
-        "Liga MX": [
-            "https://www.espn.com.mx/espn/rss/futbol/mexico/news",
+            "https://www.voetbalprimeur.nl/rss/"
         ]
     }
     

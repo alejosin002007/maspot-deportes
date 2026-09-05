@@ -34,6 +34,18 @@ export default function RootLayout({
           crossOrigin="anonymous"
           strategy="lazyOnload"
         />
+        {/* Google Translate Script */}
+        <Script
+          src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+          strategy="lazyOnload"
+        />
+        <Script id="google-translate-init" strategy="lazyOnload">
+          {`
+            function googleTranslateElementInit() {
+              new google.translate.TranslateElement({pageLanguage: 'es', includedLanguages: 'es,en,pt,fr,de,nl,it'}, 'google_translate_element');
+            }
+          `}
+        </Script>
       </head>
       <body className={`${inter.className} bg-gray-100 dark:bg-gray-900 text-black dark:text-gray-100 flex h-screen overflow-hidden`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
@@ -52,6 +64,7 @@ export default function RootLayout({
                 </Suspense>
               </div>
               <div className="flex items-center gap-4">
+                <div id="google_translate_element" className="mr-2"></div>
                 <ThemeToggle />
                 <UserAvatar />
               </div>

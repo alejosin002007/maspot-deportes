@@ -90,13 +90,13 @@ export default async function Home({ searchParams }: { searchParams: { disciplin
           {matches.map((match: any) => (
             <div key={match.id} className="min-w-[280px] bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 shrink-0">
               <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mb-3 font-bold uppercase tracking-widest">
-                {match.status && !match.status.toLowerCase().includes('finalizado') && !match.status.toLowerCase().includes('programado') && (
+                {match.status && !match.status.toLowerCase().includes('finalizado') && !match.status.toLowerCase().includes('programado') && !match.status.toLowerCase().includes('scheduled') && (
                   <span className="relative flex h-2.5 w-2.5 mr-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
                   </span>
                 )}
-                <span>{match.status} • {match.time}</span>
+                <span>{match.status} • {match.time} (ART)</span>
               </div>
               <div className="flex justify-between items-center mb-3">
                 <span className="font-semibold text-lg dark:text-white">{match.teamA}</span>
