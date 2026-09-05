@@ -5,6 +5,7 @@ import datetime
 import time
 import requests
 from bs4 import BeautifulSoup
+from deep_translator import GoogleTranslator
 
 def resolve_url_and_image(url):
     try:
@@ -21,6 +22,17 @@ def resolve_url_and_image(url):
         pass
     return None, url
 
+def traducir_es(texto):
+    if not texto: return ""
+    try:
+        res = GoogleTranslator(source='auto', target='es').translate(texto)
+        time.sleep(0.2) # Evitar baneo de Google Translate por limite de tasa
+        if "Error 500 (Server Error)" in res:
+            return texto
+        return res
+    except:
+        return texto
+
 # Ensure the backend directory is in the path to allow importing from services
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -31,8 +43,7 @@ def ingest_espn_feed(db: Session):
     # FUENTES DIRECTAS: NO SE USA GOOGLE NEWS COMO INTERMEDIARIO
     feeds_by_league = {
         "La Liga": [
-            "https://as.com/rss/futbol/primera.xml",
-            "https://www.sport.es/es/rss/barca/rss.xml",
+            "https://e00-marca.uecdn.es/rss/futbol/primera-division.xml",
         ],
         "Premier League": [
             "https://www.skysports.com/rss/11661",
@@ -42,7 +53,7 @@ def ingest_espn_feed(db: Session):
             "https://www.gazzetta.it/rss/calcio.xml"
         ],
         "Bundesliga": [
-            "https://rss.kicker.de/news/bundesliga",
+            "https://www.sportschau.de/fussball/bundesliga/index~rss2.xml",
         ],
         "Ligue 1": [
             "https://rmcsport.bfmtv.com/rss/football/ligue-1/"
@@ -89,15 +100,23 @@ def ingest_espn_feed(db: Session):
                         if days_old > 7:
                             continue # Ignorar noticias viejas
 
-                    titulo = entry.get("title", "").replace("<![CDATA[", "").replace("]]>", "").strip()
-                    resumen = entry.get("summary", "").replace("<![CDATA[", "").replace("]]>", "").strip()
+                    titulo_raw = entry.get("title", "").replace("<![CDATA[", "").replace("]]>", "").strip()
+                    resumen_raw = entry.get("summary", "").replace("<![CDATA[", "").replace("]]>", "").strip()
                     link = entry.get("link", "")
                     
-                    # FILTRO DE OTROS DEPORTES
-                    titulo_lower = titulo.lower()
+                    # FILTRO DE OTROS DEPORTES ANTES DE TRADUCIR (para ahorrar tiempo si es obvio)
+                    titulo_lower = titulo_raw.lower()
                     if any(kw in titulo_lower for kw in forbidden_keywords):
-                        print(f"Descartada por contener otra disciplina: {titulo}")
+                        print(f"Descartada por contener otra disciplina: {titulo_raw}")
                         continue
+                        
+                    # TRADUCCION AUTOMATICA NATIVA (Sin API de IA de pago)
+                    if league not in ["La Liga", "Liga Argentina"]:
+                        titulo = traducir_es(titulo_raw)
+                        resumen = traducir_es(resumen_raw)
+                    else:
+                        titulo = titulo_raw
+                        resumen = resumen_raw
                     
                     # Extraer imagen (ya sea de media_content o de links/enclosures)
                     imagen_url = None
