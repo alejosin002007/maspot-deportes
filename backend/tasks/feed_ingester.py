@@ -39,7 +39,7 @@ def ingest_espn_feed(db: Session):
             "http://feeds.bbci.co.uk/sport/football/premier-league/rss.xml"
         ],
         "Serie A": [
-            "https://sport.sky.it/rss/calcio/serie-a.xml"
+            "https://www.gazzetta.it/rss/calcio.xml"
         ],
         "Bundesliga": [
             "https://rss.kicker.de/news/bundesliga",
@@ -55,10 +55,10 @@ def ingest_espn_feed(db: Session):
             "https://www.gazetaesportiva.com/campeonatos/brasileiro-serie-a/feed/"
         ],
         "Primeira Liga": [
-            "https://www.record.pt/rss"
+            "https://feeds.feedburner.com/maisfutebol"
         ],
         "MLS": [
-            "https://en.as.com/rss/soccer/mls.xml"
+            "https://sports.yahoo.com/soccer/mls/rss.xml"
         ],
         "Eredivisie": [
             "https://www.voetbalprimeur.nl/rss/"
@@ -75,7 +75,10 @@ def ingest_espn_feed(db: Session):
     for league, feed_urls in feeds_by_league.items():
         for feed_url in feed_urls:
             try:
-                feed = feedparser.parse(feed_url)
+                headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+                res = requests.get(feed_url, headers=headers, timeout=10)
+                feed = feedparser.parse(res.content)
+                
                 # Procesar las entradas (limitado a los 8 más recientes para agilizar la carga)
                 for entry in feed.entries[:8]:
                     
@@ -86,8 +89,8 @@ def ingest_espn_feed(db: Session):
                         if days_old > 7:
                             continue # Ignorar noticias viejas
 
-                    titulo = entry.get("title", "")
-                    resumen = entry.get("summary", "")
+                    titulo = entry.get("title", "").replace("<![CDATA[", "").replace("]]>", "").strip()
+                    resumen = entry.get("summary", "").replace("<![CDATA[", "").replace("]]>", "").strip()
                     link = entry.get("link", "")
                     
                     # FILTRO DE OTROS DEPORTES
