@@ -29,6 +29,31 @@ app.add_middleware(
 # Inicializar Base de Datos (crea las tablas si no existen)
 Base.metadata.create_all(bind=engine)
 
+import asyncio
+from database import SessionLocal
+
+async def periodic_news_update():
+    # Esperar 5 segundos al inicio para permitir que FastAPI termine de arrancar
+    await asyncio.sleep(5)
+    while True:
+        try:
+            print("[CRON] Ejecutando actualización automática de noticias (cada 15 minutos)...")
+            # Usar un hilo separado para que no bloquee las peticiones de los usuarios
+            db = SessionLocal()
+            nuevas = await asyncio.to_thread(ingest_espn_feed, db)
+            print(f"[CRON] Éxito: {nuevas} noticias nuevas guardadas en la base de datos.")
+            db.close()
+        except Exception as e:
+            print(f"[CRON] Error al actualizar noticias: {e}")
+        
+        # Esperar 15 minutos (15 * 60 = 900 segundos)
+        await asyncio.sleep(900)
+
+@app.on_event("startup")
+async def startup_event():
+    # Inicia la tarea de actualización en segundo plano cuando arranca el servidor
+    asyncio.create_task(periodic_news_update())
+
 @app.get("/api/refresh")
 def refresh_news(db: Session = Depends(get_db)):
     """
