@@ -27,51 +27,51 @@ export default function Sidebar() {
   const isTodas = !currentDisciplina;
 
   return (
-    <aside className="w-64 bg-black text-white flex flex-col h-full border-r border-gray-800 shrink-0">
+    <aside className="w-64 bg-gray-900 text-white flex flex-col h-full border-r border-gray-800 shrink-0">
       <div className="p-6">
-        <h1 className="text-2xl font-black text-blue-600 dark:text-blue-400 tracking-tighter italic">
+        <h1 className="text-2xl font-black text-emerald-500 tracking-tighter italic drop-shadow-md">
           MASPOT<span className="text-white">FUTBOL</span>
         </h1>
       </div>
 
-      <div className="mb-6 p-4 mx-2 bg-gray-900 rounded-lg">
+      <div className="mb-6 p-4 mx-2 bg-gray-800/80 rounded-xl border border-gray-700/50 shadow-inner">
         {user ? (
           <div className="flex flex-col">
             <span className="text-sm text-gray-400">Bienvenido,</span>
-            <span className="font-bold text-lg mb-2">{user.nombre}</span>
-            <button onClick={handleLogout} className="text-xs text-red-500 hover:text-red-400 text-left">Cerrar sesion</button>
+            <span className="font-bold text-lg mb-2 text-emerald-400">{user.nombre}</span>
+            <button onClick={handleLogout} className="text-xs text-red-400 hover:text-red-300 text-left font-medium">Cerrar sesión</button>
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            <Link href="/login" className="bg-blue-600 hover:bg-blue-700 text-center text-sm text-white font-bold py-2 rounded">
-              Iniciar Sesion
+            <Link href="/login" className="bg-emerald-600 hover:bg-emerald-500 text-center text-sm text-white font-bold py-2 rounded-lg transition-colors shadow-md">
+              Iniciar Sesión
             </Link>
-            <Link href="/register" className="border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-800 text-center text-sm font-bold py-2 rounded">
+            <Link href="/register" className="border border-gray-600 hover:bg-gray-700 text-center text-sm text-gray-300 font-bold py-2 rounded-lg transition-colors">
               Registrarse
             </Link>
           </div>
         )}
       </div>
 
-      <nav className="flex-1 overflow-y-auto mt-4 custom-scrollbar px-3">
-        <ul className="space-y-1">
+      <nav className="flex-1 overflow-y-auto mt-2 custom-scrollbar px-3 pb-4">
+        <ul className="space-y-1.5">
           <li>
-            <Link href="/" className="block px-4 py-3 rounded-xl font-bold bg-blue-600 text-white shadow-md hover:bg-blue-700 transition">
-              Todas las Ligas
+            <Link href="/" className={`flex items-center px-4 py-3 rounded-xl font-bold transition-all transform hover:scale-[1.02] ${isTodas ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}>
+              <span className="mr-3 text-lg">🌍</span> Todas las Ligas
             </Link>
           </li>
-          <li><Link href="/?disciplina=La%20Liga" className="block px-4 py-2.5 text-gray-400 font-medium hover:bg-gray-800 rounded-xl transition">La Liga (ES)</Link></li>
-          <li><Link href="/?disciplina=Premier%20League" className="block px-4 py-2.5 text-gray-400 font-medium hover:bg-gray-800 rounded-xl transition">Premier League (EN)</Link></li>
-          <li><Link href="/?disciplina=Serie%20A" className="block px-4 py-2.5 text-gray-400 font-medium hover:bg-gray-800 rounded-xl transition">Serie A (IT)</Link></li>
-          <li><Link href="/?disciplina=Bundesliga" className="block px-4 py-2.5 text-gray-400 font-medium hover:bg-gray-800 rounded-xl transition">Bundesliga (DE)</Link></li>
-          <li><Link href="/?disciplina=Ligue%201" className="block px-4 py-2.5 text-gray-400 font-medium hover:bg-gray-800 rounded-xl transition">Ligue 1 (FR)</Link></li>
-          <li><Link href="/?disciplina=Liga%20Argentina" className="block px-4 py-2.5 text-gray-400 font-medium hover:bg-gray-800 rounded-xl transition">Liga Argentina (AR)</Link></li>
-          <li><Link href="/?disciplina=Brasileirao" className="block px-4 py-2.5 text-gray-400 font-medium hover:bg-gray-800 rounded-xl transition">Brasileirao (BR)</Link></li>
-          <li><Link href="/?disciplina=Primeira%20Liga" className="block px-4 py-2.5 text-gray-400 font-medium hover:bg-gray-800 rounded-xl transition">Primeira Liga (PT)</Link></li>
-          <li><Link href="/?disciplina=MLS" className="block px-4 py-2.5 text-gray-400 font-medium hover:bg-gray-800 rounded-xl transition">MLS (US)</Link></li>
-          <li><Link href="/?disciplina=Eredivisie" className="block px-4 py-2.5 text-gray-400 font-medium hover:bg-gray-800 rounded-xl transition">Eredivisie (NL)</Link></li>
-          <li><Link href="/?disciplina=Liga%20MX" className="block px-4 py-2.5 text-gray-400 font-medium hover:bg-gray-800 rounded-xl transition">Liga MX (MX)</Link></li>
-          <li><Link href="/?disciplina=Futbol%20Internacional" className="block px-4 py-2.5 text-gray-400 font-medium hover:bg-gray-800 rounded-xl transition">Internacional</Link></li>
+          <li><Link href="/?disciplina=La%20Liga" className={`flex items-center px-4 py-2.5 font-medium rounded-xl transition-colors ${currentDisciplina === 'La Liga' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}><img src="https://flagcdn.com/w20/es.png" className="w-5 h-auto mr-3 shadow-sm rounded-sm" alt="ES"/> La Liga</Link></li>
+          <li><Link href="/?disciplina=Premier%20League" className={`flex items-center px-4 py-2.5 font-medium rounded-xl transition-colors ${currentDisciplina === 'Premier League' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}><img src="https://flagcdn.com/w20/gb-eng.png" className="w-5 h-auto mr-3 shadow-sm rounded-sm" alt="EN"/> Premier League</Link></li>
+          <li><Link href="/?disciplina=Serie%20A" className={`flex items-center px-4 py-2.5 font-medium rounded-xl transition-colors ${currentDisciplina === 'Serie A' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}><img src="https://flagcdn.com/w20/it.png" className="w-5 h-auto mr-3 shadow-sm rounded-sm" alt="IT"/> Serie A</Link></li>
+          <li><Link href="/?disciplina=Bundesliga" className={`flex items-center px-4 py-2.5 font-medium rounded-xl transition-colors ${currentDisciplina === 'Bundesliga' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}><img src="https://flagcdn.com/w20/de.png" className="w-5 h-auto mr-3 shadow-sm rounded-sm" alt="DE"/> Bundesliga</Link></li>
+          <li><Link href="/?disciplina=Ligue%201" className={`flex items-center px-4 py-2.5 font-medium rounded-xl transition-colors ${currentDisciplina === 'Ligue 1' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}><img src="https://flagcdn.com/w20/fr.png" className="w-5 h-auto mr-3 shadow-sm rounded-sm" alt="FR"/> Ligue 1</Link></li>
+          <li><Link href="/?disciplina=Liga%20Argentina" className={`flex items-center px-4 py-2.5 font-medium rounded-xl transition-colors ${currentDisciplina === 'Liga Argentina' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}><img src="https://flagcdn.com/w20/ar.png" className="w-5 h-auto mr-3 shadow-sm rounded-sm" alt="AR"/> Liga Argentina</Link></li>
+          <li><Link href="/?disciplina=Brasileirao" className={`flex items-center px-4 py-2.5 font-medium rounded-xl transition-colors ${currentDisciplina === 'Brasileirao' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}><img src="https://flagcdn.com/w20/br.png" className="w-5 h-auto mr-3 shadow-sm rounded-sm" alt="BR"/> Brasileirão</Link></li>
+          <li><Link href="/?disciplina=Primeira%20Liga" className={`flex items-center px-4 py-2.5 font-medium rounded-xl transition-colors ${currentDisciplina === 'Primeira Liga' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}><img src="https://flagcdn.com/w20/pt.png" className="w-5 h-auto mr-3 shadow-sm rounded-sm" alt="PT"/> Primeira Liga</Link></li>
+          <li><Link href="/?disciplina=MLS" className={`flex items-center px-4 py-2.5 font-medium rounded-xl transition-colors ${currentDisciplina === 'MLS' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}><img src="https://flagcdn.com/w20/us.png" className="w-5 h-auto mr-3 shadow-sm rounded-sm" alt="US"/> MLS</Link></li>
+          <li><Link href="/?disciplina=Eredivisie" className={`flex items-center px-4 py-2.5 font-medium rounded-xl transition-colors ${currentDisciplina === 'Eredivisie' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}><img src="https://flagcdn.com/w20/nl.png" className="w-5 h-auto mr-3 shadow-sm rounded-sm" alt="NL"/> Eredivisie</Link></li>
+          <li><Link href="/?disciplina=Liga%20MX" className={`flex items-center px-4 py-2.5 font-medium rounded-xl transition-colors ${currentDisciplina === 'Liga MX' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}><img src="https://flagcdn.com/w20/mx.png" className="w-5 h-auto mr-3 shadow-sm rounded-sm" alt="MX"/> Liga MX</Link></li>
+          <li><Link href="/?disciplina=Futbol%20Internacional" className={`flex items-center px-4 py-2.5 font-medium rounded-xl transition-colors ${currentDisciplina === 'Futbol Internacional' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}><span className="mr-3 text-lg">🏆</span> Internacional</Link></li>
         </ul>
       </nav>
     </aside>

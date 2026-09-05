@@ -120,7 +120,7 @@ def classify_news(titulo: str, resumen: str) -> dict:
     try:
         ollama_url = "http://localhost:11434/api/generate"
         ollama_payload = {"model": "llama3", "prompt": prompt, "stream": False}
-        ollama_res = requests.post(ollama_url, json=ollama_payload, timeout=20)
+        ollama_res = requests.post(ollama_url, json=ollama_payload, timeout=1)
         
         if ollama_res.status_code == 200:
             content = ollama_res.json().get("response", "").strip()

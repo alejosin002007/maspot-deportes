@@ -52,9 +52,19 @@ export default async function Home({ searchParams }: { searchParams: { disciplin
     const category = n.category || n.disciplina || "General";
     const catLower = category.toLowerCase();
     
-    // Si la fuente RSS no trae imagen original, usamos loremflickr para inyectar una aleatoria (pero fija por id)
-    const keyword = "soccer,football";
-    const defaultImg = `https://loremflickr.com/800/600/${keyword}?lock=${n.id || Math.floor(Math.random() * 100)}`;
+    // Logos oficiales de las ligas como respaldo
+    const categoryLogos: Record<string, string> = {
+        "La Liga": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/LaLiga_logo_2023.svg/1024px-LaLiga_logo_2023.svg.png",
+        "Premier League": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Premier_League_Logo.svg/1200px-Premier_League_Logo.svg.png",
+        "Serie A": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e1/Serie_A_logo_%282022%29.svg/1200px-Serie_A_logo_%282022%29.svg.png",
+        "Bundesliga": "https://upload.wikimedia.org/wikipedia/en/thumb/d/df/Bundesliga_logo_%282017%29.svg/1200px-Bundesliga_logo_%282017%29.svg.png",
+        "Ligue 1": "https://upload.wikimedia.org/wikipedia/en/thumb/b/ba/Ligue_1_Uber_Eats.svg/1200px-Ligue_1_Uber_Eats.svg.png",
+        "Liga Argentina": "https://upload.wikimedia.org/wikipedia/en/thumb/e/ed/AFA_logo.svg/1200px-AFA_logo.svg.png",
+        "Brasileirao": "https://upload.wikimedia.org/wikipedia/en/thumb/4/42/Campeonato_Brasileiro_S%C3%A9rie_A_logo.png/1200px-Campeonato_Brasileiro_S%C3%A9rie_A_logo.png",
+        "Liga MX": "https://upload.wikimedia.org/wikipedia/en/thumb/c/cb/Liga_MX.svg/1200px-Liga_MX.svg.png",
+        "MLS": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/MLS_crest_logo_RGB_gradient.svg/1200px-MLS_crest_logo_RGB_gradient.svg.png",
+    };
+    const defaultImg = categoryLogos[category] || `https://placehold.co/800x600/059669/ffffff?text=Maspot+Futbol`;
 
     // Limpiar imágenes defectuosas de Google News
     let finalImg = n.imagen_url || n.img || defaultImg;
