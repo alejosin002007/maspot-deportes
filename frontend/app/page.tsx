@@ -40,11 +40,14 @@ export default async function Home({ searchParams }: { searchParams: { disciplin
   // y nuestro componente UI las espera en inglés (title, teamA, teamB, score)
   const allMatches = rawMatches.map((m: any) => ({
     id: m.id,
-    teamA: m.teamA || (m.encuentro ? m.encuentro.split(" vs ")[0] : "Equipo A"),
-    teamB: m.teamB || (m.encuentro ? m.encuentro.split(" vs ")[1] : "Equipo B"),
+    teamA: m.team_home || m.teamA || (m.encuentro ? m.encuentro.split(" vs ")[0] : "Equipo A"),
+    teamB: m.team_away || m.teamB || (m.encuentro ? m.encuentro.split(" vs ")[1] : "Equipo B"),
+    logoA: m.logo_home || "",
+    logoB: m.logo_away || "",
     score: m.score || m.resultado || "vs",
     status: m.status || m.estado || "",
-    time: m.time || m.fecha || "Hoy",
+    fecha: m.fecha || "",
+    hora: m.hora || "",
     category: m.disciplina || m.category || ""
   }));
 
@@ -56,7 +59,7 @@ export default async function Home({ searchParams }: { searchParams: { disciplin
     const encodedCat = encodeURIComponent(category);
     const defaultImg = `https://placehold.co/800x600/059669/ffffff?text=${encodedCat}`;
 
-    // Limpiar imágenes defectuosas de Google News
+    // Limpiar imǭgenes defectuosas de Google News
     let finalImg = n.imagen_url || n.img || defaultImg;
     if (finalImg && (finalImg.includes("googleusercontent") || finalImg.includes("gstatic") || finalImg.includes("news.google.com") || finalImg === "https://news.google.com/rss")) {
         finalImg = defaultImg;
@@ -72,14 +75,43 @@ export default async function Home({ searchParams }: { searchParams: { disciplin
     };
   });
 
-  // LÓGICA DE FILTRADO
+  // LÓGICA DE FILTRADO Y ORDEN INTERCALADO
   const matches = selectedCategory 
     ? allMatches.filter((m: any) => m.category.toLowerCase() === selectedCategory.toLowerCase())
     : allMatches;
 
-  const news = selectedCategory
-    ? allNews.filter((n: any) => n.category.toLowerCase() === selectedCategory.toLowerCase())
-    : allNews;
+  let news = [];
+  if (selectedCategory) {
+    news = allNews.filter((n: any) => n.category.toLowerCase() === selectedCategory.toLowerCase());
+  } else {
+    // Intercalar y priorizar ligas
+    const groupedNews: Record<string, any[]> = {};
+    allNews.forEach((n: any) => {
+      if (!groupedNews[n.category]) groupedNews[n.category] = [];
+      groupedNews[n.category].push(n);
+    });
+    
+    const leagueOrder = ["Premier League", "La Liga", "Liga Argentina", "Serie A", "Bundesliga", "Ligue 1", "Internacional", "Brasileirao", "Primeira Liga", "MLS", "Eredivisie"];
+    
+    let added = true;
+    while(added) {
+       added = false;
+       // Primero recorremos la lista prioritaria
+       for (const league of leagueOrder) {
+          if (groupedNews[league] && groupedNews[league].length > 0) {
+              news.push(groupedNews[league].shift());
+              added = true;
+          }
+       }
+       // Luego cualquier otra liga que haya quedado
+       for (const league in groupedNews) {
+          if (!leagueOrder.includes(league) && groupedNews[league].length > 0) {
+              news.push(groupedNews[league].shift());
+              added = true;
+          }
+       }
+    }
+  }
 
   return (
     <div className="space-y-16">
@@ -89,20 +121,33 @@ export default async function Home({ searchParams }: { searchParams: { disciplin
         <div className="flex space-x-6 overflow-x-auto pb-4 custom-scrollbar">
           {matches.map((match: any) => (
             <div key={match.id} className="min-w-[280px] bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 shrink-0">
-              <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mb-3 font-bold uppercase tracking-widest">
-                {match.status && !match.status.toLowerCase().includes('finalizado') && !match.status.toLowerCase().includes('programado') && !match.status.toLowerCase().includes('scheduled') && (
-                  <span className="relative flex h-2.5 w-2.5 mr-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
-                  </span>
+              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-3 font-bold uppercase tracking-widest">
+                <div className="flex items-center">
+                    {match.status === 'EN CURSO' && (
+                      <span className="relative flex h-2.5 w-2.5 mr-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                      </span>
+                    )}
+                    <span className={match.status === 'EN CURSO' || match.status === 'ENTRETIEMPO' ? 'text-red-500 dark:text-red-400' : ''}>
+                        {match.status}
+                    </span>
+                </div>
+                {match.status === 'PROGRAMADO' && match.hora && (
+                    <span>{match.fecha} - {match.hora}HS</span>
                 )}
-                <span>{match.status} • {match.time} (ART)</span>
               </div>
               <div className="flex justify-between items-center mb-3">
-                <span className="font-semibold text-lg dark:text-white">{match.teamA}</span>
+                <div className="flex items-center space-x-3">
+                  {match.logoA && <img src={match.logoA} alt={match.teamA} className="w-6 h-6 object-contain" />}
+                  <span className="font-semibold text-lg dark:text-white">{match.teamA}</span>
+                </div>
               </div>
               <div className="flex justify-between items-center">
-                <span className="font-semibold text-lg dark:text-white">{match.teamB}</span>
+                <div className="flex items-center space-x-3">
+                  {match.logoB && <img src={match.logoB} alt={match.teamB} className="w-6 h-6 object-contain" />}
+                  <span className="font-semibold text-lg dark:text-white">{match.teamB}</span>
+                </div>
                 <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{match.score || 'vs'}</span>
               </div>
             </div>

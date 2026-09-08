@@ -6,6 +6,8 @@ import time
 import requests
 from bs4 import BeautifulSoup
 from deep_translator import GoogleTranslator
+import random
+import time
 
 def resolve_url_and_image(url):
     try:
@@ -22,25 +24,46 @@ def resolve_url_and_image(url):
         pass
     return None, url
 
-def traducir_es(texto):
+import html
+import re
+
+def limpiar_html(texto):
+    if not texto: return ""
+    return html.unescape(re.sub(r'<[^>]+>', '', texto)).strip()
+
+def traducir_es(texto, league=""):
     if not texto: return ""
     try:
-        res = GoogleTranslator(source='auto', target='es').translate(texto)
-        time.sleep(0.2) # Evitar baneo de Google Translate por limite de tasa
-        if "Error 500 (Server Error)" in res:
-            return texto
-        return res
-    except:
+        import urllib.parse
+        encoded = urllib.parse.quote(texto)
+        url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=es&dt=t&q={encoded}"
+        res = requests.get(url, timeout=5)
+        if res.status_code == 200:
+            data = res.json()
+            if data and data[0]:
+                translated = "".join([d[0] for d in data[0] if d[0]])
+                return translated
+        return texto
+    except Exception:
         return texto
 
 # Ensure the backend directory is in the path to allow importing from services
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from sqlalchemy.orm import Session
+from database import SessionLocal
 from models import Noticia
 
-def ingest_espn_feed(db: Session):
-    # FUENTES DIRECTAS: NO SE USA GOOGLE NEWS COMO INTERMEDIARIO
+def ingest_espn_feed(db):
+    print("Iniciando tarea periódica de ingesta de noticias deportivas...")
+    now = time.time()
+    
+    # Palabras clave prohibidas (otros deportes)
+    forbidden_keywords = [
+        "rugby", "tenis", "basquet", "f1", "formula 1", "nba", "boxeo", "natacion", "voley", "atletismo", 
+        "colapinto", "pumas", "alcaraz", "djokovic", "sinner", "cerundolo", "nadal", "sabalenka", "fritz",
+        "motogp", "motos", "pole", "gasly", "ciclismo", "piloto", "escuderia", "red bull", "mercedes", "ferrari", "verstappen", "hamilton", "sainz"
+    ]
+
+    
     feeds_by_league = {
         "La Liga": [
             "https://e00-marca.uecdn.es/rss/futbol/primera-division.xml",
@@ -50,10 +73,10 @@ def ingest_espn_feed(db: Session):
             "http://feeds.bbci.co.uk/sport/football/premier-league/rss.xml"
         ],
         "Serie A": [
-            "https://www.gazzetta.it/rss/calcio.xml"
+            "https://www.tuttosport.com/rss/calcio/serie-a"
         ],
         "Bundesliga": [
-            "https://www.sportschau.de/fussball/bundesliga/index~rss2.xml",
+            "https://www.90min.de/posts.rss"
         ],
         "Ligue 1": [
             "https://rmcsport.bfmtv.com/rss/football/ligue-1/"
@@ -66,13 +89,16 @@ def ingest_espn_feed(db: Session):
             "https://www.gazetaesportiva.com/campeonatos/brasileiro-serie-a/feed/"
         ],
         "Primeira Liga": [
-            "https://feeds.feedburner.com/maisfutebol"
+            "https://www.record.pt/rss"
         ],
         "MLS": [
             "https://sports.yahoo.com/soccer/mls/rss.xml"
         ],
         "Eredivisie": [
             "https://www.voetbalprimeur.nl/rss/"
+        ],
+        "Internacional": [
+            "https://as.com/rss/futbol/internacional.xml"
         ]
     }
     
@@ -80,7 +106,11 @@ def ingest_espn_feed(db: Session):
     now = time.time()
     
     # Palabras clave prohibidas (otros deportes)
-    forbidden_keywords = ["rugby", "tenis", "basquet", "f1", "formula 1", "nba", "boxeo", "natacion", "voley", "atletismo", "colapinto", "pumas", "alcaraz", "djokovic", "sinner", "cerundolo", "nadal", "sabalenka", "fritz"]
+    forbidden_keywords = [
+        "rugby", "tenis", "basquet", "f1", "formula 1", "nba", "boxeo", "natacion", "voley", "atletismo", 
+        "colapinto", "pumas", "alcaraz", "djokovic", "sinner", "cerundolo", "nadal", "sabalenka", "fritz",
+        "motogp", "motos", "pole", "gasly", "ciclismo", "piloto", "escuderia", "red bull", "mercedes", "ferrari", "verstappen", "hamilton", "sainz"
+    ]
 
     
     for league, feed_urls in feeds_by_league.items():
@@ -91,8 +121,12 @@ def ingest_espn_feed(db: Session):
                 feed = feedparser.parse(res.content)
                 
                 # Procesar las entradas (limitado a los 8 más recientes para agilizar la carga)
-                for entry in feed.entries[:8]:
-                    
+                nuevas = 0
+                procesadas = 0
+                for entry in feed.entries:
+                    if procesadas >= 8:
+                        break  # Limitar a las 8 mejores noticias válidas de cada feed
+                        
                     # FILTRO DE FECHA ESTRICTO: NO NOTICIAS VIEJAS (> 7 dias)
                     if hasattr(entry, 'published_parsed') and entry.published_parsed:
                         entry_time = time.mktime(entry.published_parsed)
@@ -100,9 +134,18 @@ def ingest_espn_feed(db: Session):
                         if days_old > 7:
                             continue # Ignorar noticias viejas
 
-                    titulo_raw = entry.get("title", "").replace("<![CDATA[", "").replace("]]>", "").strip()
-                    resumen_raw = entry.get("summary", "").replace("<![CDATA[", "").replace("]]>", "").strip()
+                    titulo_raw = limpiar_html(entry.get("title", "").replace("<![CDATA[", "").replace("]]>", ""))
+                    resumen_raw = limpiar_html(entry.get("summary", "").replace("<![CDATA[", "").replace("]]>", ""))
                     link = entry.get("link", "")
+                    
+                    # Filtro estricto para Record.pt (Primeira Liga) para que solo pase fútbol
+                    if league == "Primeira Liga" and "/futebol/" not in link:
+                        continue
+                    
+                    # VERIFICAR SI YA EXISTE EN BD PARA AHORRAR TRADUCCIONES Y EVITAR CRASH
+                    if db.query(Noticia).filter(Noticia.link == link).first():
+                        procesadas += 1
+                        continue
                     
                     # FILTRO DE OTROS DEPORTES ANTES DE TRADUCIR (para ahorrar tiempo si es obvio)
                     titulo_lower = titulo_raw.lower()
@@ -111,9 +154,9 @@ def ingest_espn_feed(db: Session):
                         continue
                         
                     # TRADUCCION AUTOMATICA NATIVA (Sin API de IA de pago)
-                    if league not in ["La Liga", "Liga Argentina"]:
-                        titulo = traducir_es(titulo_raw)
-                        resumen = traducir_es(resumen_raw)
+                    if league not in ["La Liga", "Liga Argentina", "Internacional"]:
+                        titulo = traducir_es(titulo_raw, league)
+                        resumen = traducir_es(resumen_raw, league)
                     else:
                         titulo = titulo_raw
                         resumen = resumen_raw
@@ -131,14 +174,12 @@ def ingest_espn_feed(db: Session):
                     # Si el RSS no trae la imagen, la resolvemos de la pagina
                     if not imagen_url:
                         print(f"Resolviendo URL final e imagen para: {link}")
-                        img_temp, link = resolve_url_and_image(link)
-                        if not imagen_url:
-                            imagen_url = img_temp
+                    # Extraer imagen y resolver URL
+                    imagen_url, final_url = resolve_url_and_image(link)
+                    link = final_url # Actualizar al enlace real
                     
-                    # Check if already exists in DB
-                    exists = db.query(Noticia).filter(Noticia.link == link).first()
-                    if not exists:
-                        # Asignación de liga 100% exacta por el origen del Feed
+                    try:
+                        # Insertar en BD
                         nueva_noticia = Noticia(
                             titulo=titulo,
                             resumen=resumen,
@@ -148,12 +189,16 @@ def ingest_espn_feed(db: Session):
                             imagen_url=imagen_url
                         )
                         db.add(nueva_noticia)
+                        db.commit()
                         nuevas += 1
+                        procesadas += 1
+                    except Exception as e:
+                        db.rollback()
+                        print(f"Error guardando entrada en BD (probablemente duplicada): {e}")
                         
             except Exception as e:
                 print(f"Error procesando el feed {feed_url}: {e}")
                 
-    db.commit()
     
     # Sistema de Auto-Limpieza: Mantener solo las últimas 300 noticias para evitar que la DB crezca infinitamente
     try:
