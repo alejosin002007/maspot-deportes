@@ -124,88 +124,108 @@ def obtener_noticias(q: Optional[str] = None, disciplina: Optional[str] = None, 
 
 import requests
 
-@app.get("/api/resultados")
-def obtener_resultados():
-    """
-    Retorna resultados deportivos REALES y en VIVO (Fútbol) usando la API pública de ESPN.
-    """
-    try:
-        res = requests.get("https://site.api.espn.com/apis/site/v2/sports/soccer/all/scoreboard", timeout=5)
-        if res.status_code == 200:
-            data = res.json()
-            events = data.get("events", [])
-            resultados = []
-            
-            for i, ev in enumerate(events[:25]): # Traemos los últimos 25 partidos
-                comp = ev['competitions'][0]
-                
-                # Extraer equipos y logos
-                team_home = comp['competitors'][0]['team']['shortDisplayName']
-                logo_home = comp['competitors'][0]['team'].get('logo', '')
-                score_home = comp['competitors'][0].get('score', '0')
-                
-                team_away = comp['competitors'][1]['team']['shortDisplayName']
-                logo_away = comp['competitors'][1]['team'].get('logo', '')
-                score_away = comp['competitors'][1].get('score', '0')
-                
-                # Extraer liga a partir del slug de la temporada
-                slug = ev.get('season', {}).get('slug', '').lower()
-                disciplina = "Fútbol"
-                if 'premier-league' in slug: disciplina = "Premier League"
-                elif 'esp.1' in slug or 'laliga' in slug or 'primera-division' in slug: disciplina = "La Liga"
-                elif 'arg.1' in slug or 'primera' in slug and 'arg' in slug: disciplina = "Liga Argentina"
-                elif 'ita.1' in slug or 'serie-a' in slug: disciplina = "Serie A"
-                elif 'ger.1' in slug or 'bundesliga' in slug: disciplina = "Bundesliga"
-                elif 'fra.1' in slug or 'ligue-1' in slug: disciplina = "Ligue 1"
-                elif 'bra.1' in slug or 'brasileirao' in slug: disciplina = "Brasileirao"
-                elif 'por.1' in slug or 'primeira-liga' in slug: disciplina = "Primeira Liga"
-                elif 'usa.1' in slug or 'mls' in slug: disciplina = "MLS"
-                elif 'ned.1' in slug or 'eredivisie' in slug: disciplina = "Eredivisie"
-                elif 'uefa' in slug or 'champions' in slug or 'europa' in slug: disciplina = "Internacional"
-                
-                estado_raw = ev['status']['type']['description'] # Ej: "Finalizado", "En Curso"
-                if "Full" in estado_raw or "Final" in estado_raw:
-                    estado = "FINALIZADO"
-                elif "Half" in estado_raw:
-                    estado = "ENTRETIEMPO"
-                elif "Scheduled" in estado_raw or "Postponed" in estado_raw:
-                    estado = "PROGRAMADO"
-                else:
-                    estado = "EN CURSO"
-                
-                # Manejar fecha y hora (ej date: '2026-09-05T11:30Z')
-                raw_date = ev.get('date', '')
-                fecha_formateada = ""
-                hora_formateada = ""
-                if raw_date:
-                    try:
-                        from datetime import datetime
-                        dt = datetime.strptime(raw_date, "%Y-%m-%dT%H:%MZ")
-                        fecha_formateada = dt.strftime("%d/%m/%Y")
-                        hora_formateada = dt.strftime("%H:%M")
-                    except:
-                        pass
-                
-                resultados.append({
-                    "id": ev["id"],
-                    "encuentro": f"{team_home} vs {team_away}",
-                    "team_home": team_home,
-                    "team_away": team_away,
-                    "logo_home": logo_home,
-                    "logo_away": logo_away,
-                    "resultado": f"{score_home} - {score_away}",
-                    "estado": estado,
-                    "fecha": fecha_formateada,
-                    "hora": hora_formateada,
-                    "disciplina": disciplina
-                })
-            
-            if resultados:
-                return resultados
-    except Exception as e:
-        print(f"Error fetching live scores: {e}")
+import httpx
+import asyncio
 
-    # Fallback si falla el internet o la API
+async def fetch_league(client, league_code, nombre_liga):
+    url = f"https://site.api.espn.com/apis/site/v2/sports/soccer/{league_code}/scoreboard"
+    try:
+        resp = await client.get(url, timeout=5)
+        if resp.status_code == 200:
+            return nombre_liga, resp.json()
+    except Exception:
+        pass
+    return nombre_liga, None
+
+@app.get("/api/resultados")
+async def obtener_resultados():
+    """
+    Retorna resultados deportivos REALES y en VIVO (Fútbol) usando la API pública de ESPN, 
+    consultando ligas específicas concurrentemente.
+    """
+    leagues_to_fetch = [
+        ("eng.1", "Premier League"),
+        ("esp.1", "La Liga"),
+        ("arg.1", "Liga Argentina"),
+        ("ita.1", "Serie A"),
+        ("ger.1", "Bundesliga"),
+        ("fra.1", "Ligue 1"),
+        ("bra.1", "Brasileirao"),
+        ("por.1", "Primeira Liga"),
+        ("usa.1", "MLS"),
+        ("ned.1", "Eredivisie"),
+        ("uefa.champions", "Champions League"),
+        ("uefa.europa", "Europa League"),
+        ("conmebol.libertadores", "Copa Libertadores"),
+        ("conmebol.sudamericana", "Copa Sudamericana")
+    ]
+    
+    resultados = []
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            tasks = [fetch_league(client, code, name) for code, name in leagues_to_fetch]
+            responses = await asyncio.gather(*tasks)
+            
+            for nombre_liga, data in responses:
+                if not data: continue
+                events = data.get("events", [])
+                # Traer hasta 10 partidos por liga para no saturar
+                for ev in events[:10]:
+                    comp = ev['competitions'][0]
+                    
+                    # Extraer equipos y logos
+                    team_home = comp['competitors'][0]['team']['shortDisplayName']
+                    logo_home = comp['competitors'][0]['team'].get('logo', '')
+                    score_home = comp['competitors'][0].get('score', '0')
+                    
+                    team_away = comp['competitors'][1]['team']['shortDisplayName']
+                    logo_away = comp['competitors'][1]['team'].get('logo', '')
+                    score_away = comp['competitors'][1].get('score', '0')
+                    
+                    estado_raw = ev['status']['type']['description']
+                    if "Full" in estado_raw or "Final" in estado_raw:
+                        estado = "FINALIZADO"
+                    elif "Half" in estado_raw:
+                        estado = "ENTRETIEMPO"
+                    elif "Scheduled" in estado_raw or "Postponed" in estado_raw:
+                        estado = "PROGRAMADO"
+                    else:
+                        estado = "EN CURSO"
+                    
+                    # Manejar fecha y hora
+                    raw_date = ev.get('date', '')
+                    fecha_formateada = ""
+                    hora_formateada = ""
+                    if raw_date:
+                        try:
+                            from datetime import datetime
+                            dt = datetime.strptime(raw_date, "%Y-%m-%dT%H:%MZ")
+                            fecha_formateada = dt.strftime("%d/%m/%Y")
+                            hora_formateada = dt.strftime("%H:%M")
+                        except:
+                            pass
+                    
+                    resultados.append({
+                        "id": ev["id"],
+                        "encuentro": f"{team_home} vs {team_away}",
+                        "team_home": team_home,
+                        "team_away": team_away,
+                        "logo_home": logo_home,
+                        "logo_away": logo_away,
+                        "resultado": f"{score_home} - {score_away}",
+                        "estado": estado,
+                        "fecha": fecha_formateada,
+                        "hora": hora_formateada,
+                        "disciplina": nombre_liga
+                    })
+        
+        if resultados:
+            return resultados
+    except Exception as e:
+        print(f"Error fetching live scores concurrently: {e}")
+
+    # Fallback si falla el internet
     return [
         {
             "id": 101,
@@ -215,7 +235,9 @@ def obtener_resultados():
             "logo_home": "https://a.espncdn.com/i/teamlogos/soccer/500/86.png",
             "logo_away": "https://a.espncdn.com/i/teamlogos/soccer/500/83.png",
             "resultado": "2 - 1",
-            "estado": "Finalizado",
+            "estado": "FINALIZADO",
+            "fecha": "",
+            "hora": "",
             "disciplina": "La Liga"
         }
     ]

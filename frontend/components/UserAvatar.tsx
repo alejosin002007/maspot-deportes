@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function UserAvatar() {
-  const [user, setUser] = useState<{ nombre: string } | null>(null);
+  const [user, setUser] = useState<{ nombre: string, foto_url?: string } | null>(null);
 
   useEffect(() => {
     const userData = localStorage.getItem("user");
@@ -29,9 +29,13 @@ export default function UserAvatar() {
   return (
     <Link href="/profile" className="flex items-center gap-3 hover:opacity-80 transition cursor-pointer">
       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{user.nombre}</span>
-      <div className="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm border-2 border-emerald-200 dark:border-emerald-800">
-        {initial}
-      </div>
+      {user.foto_url ? (
+        <img src={user.foto_url} alt={user.nombre} className="w-10 h-10 rounded-full object-cover shadow-sm border-2 border-emerald-200 dark:border-emerald-800" />
+      ) : (
+        <div className="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm border-2 border-emerald-200 dark:border-emerald-800">
+          {initial}
+        </div>
+      )}
     </Link>
   );
 }

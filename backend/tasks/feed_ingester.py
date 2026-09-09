@@ -120,12 +120,12 @@ def ingest_espn_feed(db):
                 res = requests.get(feed_url, headers=headers, timeout=10)
                 feed = feedparser.parse(res.content)
                 
-                # Procesar las entradas (limitado a los 8 más recientes para agilizar la carga)
+                # Procesar las entradas (limitado a los 25 más recientes para poblar bien la portada)
                 nuevas = 0
                 procesadas = 0
                 for entry in feed.entries:
-                    if procesadas >= 8:
-                        break  # Limitar a las 8 mejores noticias válidas de cada feed
+                    if procesadas >= 25:
+                        break  # Limitar a las 25 mejores noticias válidas de cada feed
                         
                     # FILTRO DE FECHA ESTRICTO: NO NOTICIAS VIEJAS (> 7 dias)
                     if hasattr(entry, 'published_parsed') and entry.published_parsed:

@@ -19,6 +19,7 @@ class Usuario(Base):
     nombre = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     password_hash = Column(String)
+    foto_url = Column(String, nullable=True)
 
 class Favorito(Base):
     __tablename__ = "favoritos"

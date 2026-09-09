@@ -39,6 +39,10 @@ def create_access_token(data: dict):
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
+class EditProfile(BaseModel):
+    nombre: Optional[str] = None
+    foto_url: Optional[str] = None
+
 @router.post("/register")
 def register(user: UserRegister, db: Session = Depends(get_db)):
     if db.query(Usuario).filter(Usuario.email == user.email).first():
@@ -49,7 +53,7 @@ def register(user: UserRegister, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     token = create_access_token({"sub": str(new_user.id), "email": new_user.email})
-    return {"token": token, "user": {"id": new_user.id, "nombre": new_user.nombre}}
+    return {"token": token, "user": {"id": new_user.id, "nombre": new_user.nombre, "foto_url": new_user.foto_url}}
 
 @router.post("/login")
 def login(user: UserLogin, db: Session = Depends(get_db)):
@@ -57,7 +61,32 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
     if not db_user or not verify_password(user.password, db_user.password_hash):
         raise HTTPException(status_code=400, detail="Credenciales incorrectas")
     token = create_access_token({"sub": str(db_user.id), "email": db_user.email})
-    return {"token": token, "user": {"id": db_user.id, "nombre": db_user.nombre}}
+    return {"token": token, "user": {"id": db_user.id, "nombre": db_user.nombre, "foto_url": db_user.foto_url}}
+
+@router.put("/profile")
+def edit_profile(data: EditProfile, db: Session = Depends(get_db), authorization: Optional[str] = Header(None)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="No autorizado")
+    token = authorization.split(" ")[1]
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = int(payload.get("sub"))
+    except:
+        raise HTTPException(status_code=401, detail="Token inválido")
+        
+    db_user = db.query(Usuario).filter(Usuario.id == user_id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+        
+    if data.nombre:
+        db_user.nombre = data.nombre
+    if data.foto_url is not None:
+        db_user.foto_url = data.foto_url
+        
+    db.commit()
+    db.refresh(db_user)
+    
+    return {"status": "ok", "user": {"id": db_user.id, "nombre": db_user.nombre, "foto_url": db_user.foto_url}}
 
 @router.post("/change-password")
 def change_password(data: ChangePassword, db: Session = Depends(get_db), authorization: Optional[str] = Header(None)):

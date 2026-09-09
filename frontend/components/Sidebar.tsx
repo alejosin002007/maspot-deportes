@@ -29,9 +29,11 @@ export default function Sidebar() {
   return (
     <aside className="w-64 bg-gray-900 text-white flex flex-col h-full border-r border-gray-800 shrink-0">
       <div className="p-6">
-        <h1 className="text-2xl font-black text-emerald-500 tracking-tighter italic drop-shadow-md">
-          MASPOT<span className="text-white">FUTBOL</span>
-        </h1>
+        <Link href="/" className="block hover:opacity-80 transition cursor-pointer">
+          <h1 className="text-2xl font-black text-emerald-500 tracking-tighter italic drop-shadow-md">
+            MASPOT<span className="text-white">FUTBOL</span>
+          </h1>
+        </Link>
       </div>
 
       <div className="mb-6 p-4 mx-2 bg-gray-800/80 rounded-xl border border-gray-700/50 shadow-inner">
@@ -39,7 +41,7 @@ export default function Sidebar() {
           <div className="flex flex-col">
             <span className="text-sm text-gray-400">Bienvenido,</span>
             <span className="font-bold text-lg mb-2 text-emerald-400">{user.nombre}</span>
-            <button onClick={handleLogout} className="text-xs text-red-400 hover:text-red-300 text-left font-medium">Cerrar sesión</button>
+            <button onClick={handleLogout} className="text-xs text-red-400 hover:text-red-300 text-left font-medium border-t border-gray-700/50 pt-2 mt-1">Cerrar sesión</button>
           </div>
         ) : (
           <div className="flex flex-col gap-2">

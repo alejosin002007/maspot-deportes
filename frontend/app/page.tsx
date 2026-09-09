@@ -1,5 +1,6 @@
 import NewsCard from "@/components/NewsCard";
 import AdBanner from "@/components/AdBanner";
+import MatchSlider from "@/components/MatchSlider";
 import React from "react";
 
 export const dynamic = 'force-dynamic';
@@ -115,47 +116,10 @@ export default async function Home({ searchParams }: { searchParams: { disciplin
 
   return (
     <div className="space-y-16">
-      {/* Resultados */}
-      <section>
-        <h2 className="text-2xl font-bold mb-8 dark:text-white">Resultados y Próximos Partidos</h2>
-        <div className="flex space-x-6 overflow-x-auto pb-4 custom-scrollbar">
-          {matches.map((match: any) => (
-            <div key={match.id} className="min-w-[280px] bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 shrink-0">
-              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-3 font-bold uppercase tracking-widest">
-                <div className="flex items-center">
-                    {match.status === 'EN CURSO' && (
-                      <span className="relative flex h-2.5 w-2.5 mr-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
-                      </span>
-                    )}
-                    <span className={match.status === 'EN CURSO' || match.status === 'ENTRETIEMPO' ? 'text-red-500 dark:text-red-400' : ''}>
-                        {match.status}
-                    </span>
-                </div>
-                {match.status === 'PROGRAMADO' && match.hora && (
-                    <span>{match.fecha} - {match.hora}HS</span>
-                )}
-              </div>
-              <div className="flex justify-between items-center mb-3">
-                <div className="flex items-center space-x-3">
-                  {match.logoA && <img src={match.logoA} alt={match.teamA} className="w-6 h-6 object-contain" />}
-                  <span className="font-semibold text-lg dark:text-white">{match.teamA}</span>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-3">
-                  {match.logoB && <img src={match.logoB} alt={match.teamB} className="w-6 h-6 object-contain" />}
-                  <span className="font-semibold text-lg dark:text-white">{match.teamB}</span>
-                </div>
-                <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{match.score || 'vs'}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* Resultados y Slider Interactivo */}
+      <MatchSlider initialMatches={allMatches} selectedCategory={selectedCategory} />
 
-      {/* Grilla de Noticias */}
+      {/* Grid de Noticias */}
       <section>
         <h2 className="text-2xl font-bold mb-8 dark:text-white">Últimas Noticias</h2>
         {news.length > 0 ? (
