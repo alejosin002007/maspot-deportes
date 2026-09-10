@@ -57,7 +57,7 @@ export default function RootLayout({
               </div>
               
               <div className="flex-1 flex items-center justify-end gap-4">
-                <Link href="/clasificacion" className="px-5 py-2 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-full text-sm font-bold hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 transition-colors shadow-sm">
+                <Link href="/clasificacion" className="px-7 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-full text-base font-black hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 transition-all shadow-md transform hover:scale-105">
                   🏆 Tablas
                 </Link>
                 <ThemeToggle />
