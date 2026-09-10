@@ -98,7 +98,9 @@ def ingest_espn_feed(db):
             "https://www.voetbalprimeur.nl/rss/"
         ],
         "Internacional": [
-            "https://as.com/rss/futbol/internacional.xml"
+            "https://as.com/rss/futbol/internacional.xml",
+            "https://e00-marca.uecdn.es/rss/futbol/seleccion.xml",
+            "https://www.ole.com.ar/rss/futbol-internacional/"
         ]
     }
     
