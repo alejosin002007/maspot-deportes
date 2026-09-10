@@ -3,9 +3,11 @@ import AdBanner from "@/components/AdBanner";
 import MatchSlider from "@/components/MatchSlider";
 import React from "react";
 
+import NewsGrid from "@/components/NewsGrid";
+
 export const dynamic = 'force-dynamic';
 
-export default async function Home({ searchParams }: { searchParams: { disciplina?: string, q?: string } }) {
+export default async function Home({ searchParams }: { searchParams: { disciplina?: string, q?: string, date?: string } }) {
   // Función helper para fetchear datos con fallback
   async function fetchBackend(endpoint: string, fallbackData: any) {
     try {
@@ -28,13 +30,17 @@ export default async function Home({ searchParams }: { searchParams: { disciplin
 
   const selectedCategory = searchParams.disciplina;
   const searchQuery = searchParams.q;
+  const dateQuery = searchParams.date;
 
   // Construir la URL de noticias con parámetros
   let noticiasUrl = 'noticias?';
   if (selectedCategory) noticiasUrl += `disciplina=${encodeURIComponent(selectedCategory)}&`;
   if (searchQuery) noticiasUrl += `q=${encodeURIComponent(searchQuery)}&`;
 
-  const rawMatches = await fetchBackend('resultados', fallbackMatches);
+  let resultadosUrl = 'resultados';
+  if (dateQuery) resultadosUrl += `?date=${encodeURIComponent(dateQuery)}`;
+
+  const rawMatches = await fetchBackend(resultadosUrl, fallbackMatches);
   const rawNews = await fetchBackend(noticiasUrl, fallbackNews);
 
   // Normalizamos las propiedades porque el backend las envía en español (titulo, encuentro, resultado) 
@@ -116,26 +122,16 @@ export default async function Home({ searchParams }: { searchParams: { disciplin
 
   return (
     <div className="space-y-16">
-      {/* Resultados y Slider Interactivo */}
-      <MatchSlider initialMatches={allMatches} selectedCategory={selectedCategory} />
+      {/* Resultados y Slider Interactivo con Navegación de Fecha */}
+      <MatchSlider initialMatches={allMatches} selectedCategory={selectedCategory} currentDate={dateQuery} />
 
       {/* Grid de Noticias */}
       <section>
         <h2 className="text-2xl font-bold mb-8 dark:text-white">Últimas Noticias</h2>
         {news.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
-            {news.map((item: any, index: number) => (
-              <React.Fragment key={item.id}>
-                {/* Inyectar un anuncio cada 6 noticias, comenzando después de la 3ra */}
-                {index > 0 && index % 6 === 3 && (
-                  <AdBanner dataAdSlot={`banner-${index}`} />
-                )}
-                <NewsCard item={item} />
-              </React.Fragment>
-            ))}
-          </div>
+          <NewsGrid initialNews={news} />
         ) : (
-          <div className="w-full py-16 flex flex-col items-center justify-center bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="w-full py-16 flex flex-col items-center justify-center bg-white dark:bg-black rounded-2xl shadow-sm border border-gray-200 dark:border-[#144a2d]">
             <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">No se encontraron noticias</h3>
             <p className="text-gray-400 dark:text-gray-500">Intenta buscar otra palabra o selecciona otra categoría.</p>
           </div>

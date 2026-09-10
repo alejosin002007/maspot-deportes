@@ -17,7 +17,8 @@ export const metadata: Metadata = {
   description: "Portal de fútbol mundial",
 };
 
-import Script from "next/script";
+import Script from 'next/script';
+
 
 export default function RootLayout({
   children,
@@ -35,7 +36,7 @@ export default function RootLayout({
           strategy="lazyOnload"
         />
       </head>
-      <body className={`${inter.className} bg-gray-100 dark:bg-gray-900 text-black dark:text-gray-100 flex h-screen overflow-hidden`}>
+      <body className={`${inter.className} bg-gray-100 dark:bg-gray-950 text-black dark:text-gray-100 flex h-screen overflow-hidden`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <Suspense fallback={<div className="w-64 bg-black h-full shrink-0"></div>}>
             <Sidebar />
@@ -44,21 +45,28 @@ export default function RootLayout({
           {/* Main Content */}
           <div className="flex-1 flex flex-col h-full overflow-hidden">
             {/* Header */}
-            <header className="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-8 shrink-0 shadow-sm">
-              <div className="text-xl font-semibold dark:text-white">Noticias</div>
-              <div className="w-1/3 min-w-[200px]">
-                <Suspense fallback={<div className="w-full h-9 bg-gray-100 dark:bg-gray-700 rounded-full animate-pulse"></div>}>
+            <header className="h-16 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-[#144a2d] flex items-center justify-between px-8 shrink-0 shadow-sm">
+              <div className="flex-1 flex items-center">
+                <div className="text-xl font-bold dark:text-white tracking-tight">Noticias</div>
+              </div>
+              
+              <div className="flex-1 flex justify-center max-w-lg w-full">
+                <Suspense fallback={<div className="w-full max-w-md h-10 bg-gray-100 dark:bg-gray-700 rounded-full animate-pulse"></div>}>
                   <SearchBar />
                 </Suspense>
               </div>
-              <div className="flex items-center gap-4">
+              
+              <div className="flex-1 flex items-center justify-end gap-4">
+                <Link href="/clasificacion" className="px-5 py-2 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-full text-sm font-bold hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 transition-colors shadow-sm">
+                  🏆 Tablas
+                </Link>
                 <ThemeToggle />
                 <UserAvatar />
               </div>
             </header>
 
             {/* Page content */}
-            <main className="flex-1 overflow-y-auto p-8 bg-gray-100 dark:bg-gray-900">
+            <main className="flex-1 overflow-y-auto p-8 bg-gray-100 dark:bg-gray-950">
               {children}
             </main>
           </div>

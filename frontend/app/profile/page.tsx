@@ -90,7 +90,7 @@ export default function Profile() {
   return (
     <div className="p-8 space-y-12 max-w-7xl mx-auto">
       {/* Panel Superior: Usuario */}
-      <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
+      <div className="bg-white dark:bg-black rounded-3xl p-8 shadow-sm border border-gray-100 dark:border-[#144a2d] flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
         
         {/* Avatar */}
         <div className="shrink-0">
@@ -117,11 +117,11 @@ export default function Profile() {
           <form onSubmit={handleUpdate} className="flex-1 w-full space-y-4">
             <div>
               <label className="block text-sm font-bold mb-1 text-gray-700 dark:text-gray-300">Nombre</label>
-              <input type="text" required value={nombreInput} onChange={e => setNombreInput(e.target.value)} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-3 rounded-xl outline-none" />
+              <input type="text" required value={nombreInput} onChange={e => setNombreInput(e.target.value)} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#071a10] text-gray-900 dark:text-white p-3 rounded-xl outline-none" />
             </div>
             <div>
               <label className="block text-sm font-bold mb-1 text-gray-700 dark:text-gray-300">URL de Foto</label>
-              <input type="url" value={fotoUrlInput} onChange={e => setFotoUrlInput(e.target.value)} placeholder="https://ejemplo.com/mifoto.jpg" className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-3 rounded-xl outline-none" />
+              <input type="url" value={fotoUrlInput} onChange={e => setFotoUrlInput(e.target.value)} placeholder="https://ejemplo.com/mifoto.jpg" className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#071a10] text-gray-900 dark:text-white p-3 rounded-xl outline-none" />
             </div>
             <div className="flex gap-4">
               <button type="submit" className="bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-emerald-700 transition">Guardar</button>
@@ -133,7 +133,7 @@ export default function Profile() {
 
       {/* Panel Inferior: Favoritos */}
       <div>
-        <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">
+        <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-8 border-b border-gray-200 dark:border-[#144a2d] pb-4">
           ⭐ Mis Noticias Guardadas
         </h2>
         {noticias.length === 0 ? (

@@ -32,7 +32,7 @@ export default function Register() {
 
   return (
     <div className="flex items-center justify-center py-10">
-      <div className="max-w-md w-full p-8 bg-white dark:bg-gray-800 shadow-xl rounded-2xl border border-gray-100 dark:border-gray-700">
+      <div className="max-w-md w-full p-8 bg-white dark:bg-black shadow-xl rounded-2xl border border-gray-100 dark:border-[#144a2d]">
         <h2 className="text-3xl font-black mb-6 text-center text-gray-900 dark:text-white">Crear Cuenta</h2>
         {error && <div className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 p-3 rounded mb-4 text-center font-medium">{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -43,7 +43,7 @@ export default function Register() {
               required 
               value={nombre} 
               onChange={(e) => setNombre(e.target.value)} 
-              className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition" 
+              className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#071a10] text-gray-900 dark:text-white p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition" 
             />
           </div>
           <div>
@@ -53,7 +53,7 @@ export default function Register() {
               required 
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
-              className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition" 
+              className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#071a10] text-gray-900 dark:text-white p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition" 
             />
           </div>
           <div>
@@ -63,7 +63,7 @@ export default function Register() {
               required 
               value={password} 
               onChange={(e) => setPassword(e.target.value)} 
-              className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition" 
+              className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#071a10] text-gray-900 dark:text-white p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition" 
             />
           </div>
           <button type="submit" className="w-full bg-blue-600 text-white p-3 rounded-xl font-black text-lg hover:bg-blue-700 transition shadow-lg shadow-blue-600/30">Registrarse</button>

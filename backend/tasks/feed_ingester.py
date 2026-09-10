@@ -129,7 +129,8 @@ def ingest_espn_feed(db):
                         
                     # FILTRO DE FECHA ESTRICTO: NO NOTICIAS VIEJAS (> 7 dias)
                     if hasattr(entry, 'published_parsed') and entry.published_parsed:
-                        entry_time = time.mktime(entry.published_parsed)
+                        import calendar
+                        entry_time = calendar.timegm(entry.published_parsed)
                         days_old = (now - entry_time) / 86400
                         if days_old > 7:
                             continue # Ignorar noticias viejas
@@ -138,7 +139,7 @@ def ingest_espn_feed(db):
                     resumen_raw = limpiar_html(entry.get("summary", "").replace("<![CDATA[", "").replace("]]>", ""))
                     link = entry.get("link", "")
                     
-                    # Filtro estricto para Record.pt (Primeira Liga) para que solo pase fútbol
+                    # Filtro estricto para Record.pt (Primeira Liga) para que solo pase fǧtbol
                     if league == "Primeira Liga" and "/futebol/" not in link:
                         continue
                     
@@ -179,13 +180,23 @@ def ingest_espn_feed(db):
                     link = final_url # Actualizar al enlace real
                     
                     try:
+                        # Obtener fecha de publicacion real del RSS, convirtiendo de UTC a Local (-3)
+                        fecha_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+                        if hasattr(entry, 'published_parsed') and entry.published_parsed:
+                            import calendar
+                            from datetime import timezone, timedelta
+                            utc_timestamp = calendar.timegm(entry.published_parsed)
+                            dt_utc = datetime.datetime.fromtimestamp(utc_timestamp, tz=timezone.utc)
+                            dt_local = dt_utc.astimezone(timezone(timedelta(hours=-3)))
+                            fecha_str = dt_local.strftime("%Y-%m-%d %H:%M")
+                            
                         # Insertar en BD
                         nueva_noticia = Noticia(
                             titulo=titulo,
                             resumen=resumen,
                             link=link,
                             disciplina=league,
-                            fecha=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                            fecha=fecha_str,
                             imagen_url=imagen_url
                         )
                         db.add(nueva_noticia)
