@@ -114,9 +114,9 @@ def obtener_noticias(q: Optional[str] = None, disciplina: Optional[str] = None, 
             if not any(grupos.values()):
                 mezcla.extend(otros)
                 break
-        noticias_db = mezcla[:36]
+        noticias_db = mezcla[:150]
     else:
-        noticias_db = noticias_db[:36]
+        noticias_db = noticias_db[:150]
 
     formatted_news = []
     for n in noticias_db:
