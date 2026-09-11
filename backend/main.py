@@ -16,6 +16,8 @@ app.include_router(favoritos.router)
 origins = [
     "http://localhost",
     "http://localhost:3000",
+    "https://maspot-deportes.vercel.app",
+    "*"
 ]
 
 app.add_middleware(

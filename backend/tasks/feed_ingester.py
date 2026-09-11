@@ -34,17 +34,10 @@ def limpiar_html(texto):
 def traducir_es(texto, league=""):
     if not texto: return ""
     try:
-        import urllib.parse
-        encoded = urllib.parse.quote(texto)
-        url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=es&dt=t&q={encoded}"
-        res = requests.get(url, timeout=5)
-        if res.status_code == 200:
-            data = res.json()
-            if data and data[0]:
-                translated = "".join([d[0] for d in data[0] if d[0]])
-                return translated
-        return texto
-    except Exception:
+        from deep_translator import GoogleTranslator
+        return GoogleTranslator(source='auto', target='es').translate(texto)
+    except Exception as e:
+        print("Traduccion fallida:", e)
         return texto
 
 # Ensure the backend directory is in the path to allow importing from services
