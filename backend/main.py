@@ -207,10 +207,12 @@ async def obtener_resultados():
                     hora_formateada = ""
                     if raw_date:
                         try:
-                            from datetime import datetime
+                            from datetime import datetime, timedelta
                             dt = datetime.strptime(raw_date, "%Y-%m-%dT%H:%MZ")
-                            fecha_formateada = dt.strftime("%d/%m/%Y")
-                            hora_formateada = dt.strftime("%H:%M")
+                            # Ajuste de zona horaria a Argentina (UTC-3)
+                            dt_local = dt - timedelta(hours=3)
+                            fecha_formateada = dt_local.strftime("%d/%m/%Y")
+                            hora_formateada = dt_local.strftime("%H:%M")
                         except:
                             pass
                     

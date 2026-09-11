@@ -77,6 +77,7 @@ def ingest_espn_feed(db):
             "https://e00-marca.uecdn.es/rss/futbol/ligue-1.xml"
         ],
         "Liga Argentina": [
+            "https://www.tycsports.com/rss/liga-profesional-de-futbol.xml",
             "https://www.ole.com.ar/rss/futbol-primera/"
         ],
         "Brasileirao": [
