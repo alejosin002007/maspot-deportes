@@ -35,7 +35,10 @@ def traducir_es(texto, league=""):
     if not texto: return ""
     try:
         from deep_translator import GoogleTranslator
-        return GoogleTranslator(source='auto', target='es').translate(texto)
+        translated = GoogleTranslator(source='auto', target='es').translate(texto)
+        if "Error 500" in translated or "That's an error" in translated:
+            return texto
+        return translated
     except Exception as e:
         print("Traduccion fallida:", e)
         return texto

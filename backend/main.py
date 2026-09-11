@@ -67,6 +67,12 @@ def refresh_news(db: Session = Depends(get_db)):
     except Exception as e:
         return {"status": "error", "mensaje": str(e)}
 
+@app.get("/api/clear-news")
+def clear_news(db: Session = Depends(get_db)):
+    count = db.query(models.Noticia).delete()
+    db.commit()
+    return {"status": "ok", "deleted": count}
+
 from typing import Optional
 
 @app.get("/api/noticias")
