@@ -116,7 +116,7 @@ export default function ClasificacionClient() {
     const fetchStandings = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`http://localhost:8000/api/clasificacion?liga=${liga}&jornada=${jornada}`);
+        const res = await fetch(`https://maspot-deportes.onrender.com/api/clasificacion?liga=${liga}&jornada=${jornada}`);
         if (res.ok) {
           const json = await res.json();
           setData(json);

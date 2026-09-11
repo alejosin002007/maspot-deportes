@@ -32,7 +32,7 @@ export default function Profile() {
     // Cargar Favoritos
     const fetchFavoritos = async () => {
       try {
-        const res = await fetch("http://127.0.0.1:8000/api/favoritos", {
+        const res = await fetch("https://maspot-deportes.onrender.com/api/favoritos", {
           headers: { "Authorization": `Bearer ${token}` }
         });
         if (res.ok) {
@@ -66,7 +66,7 @@ export default function Profile() {
     if (!token) return;
 
     try {
-      const res = await fetch("http://localhost:8000/api/auth/profile", {
+      const res = await fetch("https://maspot-deportes.onrender.com/api/auth/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
         body: JSON.stringify({ nombre: nombreInput, foto_url: fotoUrlInput }),

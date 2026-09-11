@@ -17,7 +17,7 @@ export default function NewsCard({ item, defaultSaved = false }: { item: any, de
     if (!token) return alert("Debes iniciar sesión para guardar noticias");
     
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/favoritos/${item.id}`, {
+      const res = await fetch(`https://maspot-deportes.onrender.com/api/favoritos/${item.id}`, {
         method: isSaved ? "DELETE" : "POST",
         headers: { Authorization: `Bearer ${token}` }
       });

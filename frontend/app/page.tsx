@@ -11,7 +11,7 @@ export default async function Home({ searchParams }: { searchParams: { disciplin
   // Función helper para fetchear datos con fallback
   async function fetchBackend(endpoint: string, fallbackData: any) {
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/${endpoint}`, { cache: 'no-store' });
+      const res = await fetch(`https://maspot-deportes.onrender.com/api/${endpoint}`, { cache: 'no-store' });
       if (!res.ok) return fallbackData;
       return await res.json();
     } catch (e) {
