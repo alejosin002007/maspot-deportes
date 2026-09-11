@@ -4,10 +4,10 @@ import NewsCard from "./NewsCard";
 import AdBanner from "./AdBanner";
 
 export default function NewsGrid({ initialNews }: { initialNews: any[] }) {
-  const [visibleCount, setVisibleCount] = useState(15);
+  const [visibleCount, setVisibleCount] = useState(16);
 
   const loadMore = () => {
-    setVisibleCount(prev => prev + 15);
+    setVisibleCount(prev => prev + 16);
   };
 
   const visibleNews = initialNews.slice(0, visibleCount);
@@ -18,9 +18,6 @@ export default function NewsGrid({ initialNews }: { initialNews: any[] }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
         {visibleNews.map((item: any, index: number) => (
           <React.Fragment key={item.id}>
-            {index > 0 && index % 6 === 3 && (
-              <AdBanner dataAdSlot={`banner-${index}`} />
-            )}
             <NewsCard item={item} />
           </React.Fragment>
         ))}

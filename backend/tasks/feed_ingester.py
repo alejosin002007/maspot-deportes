@@ -65,36 +65,33 @@ def ingest_espn_feed(db):
             "https://e00-marca.uecdn.es/rss/futbol/primera-division.xml",
         ],
         "Premier League": [
-            "https://www.skysports.com/rss/11661",
-            "http://feeds.bbci.co.uk/sport/football/premier-league/rss.xml"
+            "https://e00-marca.uecdn.es/rss/futbol/premier-league.xml"
         ],
         "Serie A": [
-            "https://www.tuttosport.com/rss/calcio/serie-a"
+            "https://e00-marca.uecdn.es/rss/futbol/serie-a.xml"
         ],
         "Bundesliga": [
-            "https://www.90min.de/posts.rss"
+            "https://e00-marca.uecdn.es/rss/futbol/bundesliga.xml"
         ],
         "Ligue 1": [
-            "https://rmcsport.bfmtv.com/rss/football/ligue-1/"
+            "https://e00-marca.uecdn.es/rss/futbol/ligue-1.xml"
         ],
         "Liga Argentina": [
-            "https://www.tycsports.com/rss/liga-profesional-de-futbol.xml",
             "https://www.ole.com.ar/rss/futbol-primera/"
         ],
         "Brasileirao": [
-            "https://www.gazetaesportiva.com/campeonatos/brasileiro-serie-a/feed/"
+            "https://e00-marca.uecdn.es/rss/futbol/america.xml"
         ],
         "Primeira Liga": [
-            "https://www.record.pt/rss"
+            "https://e00-marca.uecdn.es/rss/futbol/futbol-internacional.xml"
         ],
         "MLS": [
-            "https://sports.yahoo.com/soccer/mls/rss.xml"
+            "https://e00-marca.uecdn.es/rss/futbol/estados-unidos.xml"
         ],
         "Eredivisie": [
-            "https://www.voetbalprimeur.nl/rss/"
+            "https://as.com/rss/futbol/internacional.xml"
         ],
         "Internacional": [
-            "https://as.com/rss/futbol/internacional.xml",
             "https://e00-marca.uecdn.es/rss/futbol/seleccion.xml",
             "https://www.ole.com.ar/rss/futbol-internacional/"
         ]
@@ -152,13 +149,9 @@ def ingest_espn_feed(db):
                         print(f"Descartada por contener otra disciplina: {titulo_raw}")
                         continue
                         
-                    # TRADUCCION AUTOMATICA NATIVA (Sin API de IA de pago)
-                    if league not in ["La Liga", "Liga Argentina", "Internacional"]:
-                        titulo = traducir_es(titulo_raw, league)
-                        resumen = traducir_es(resumen_raw, league)
-                    else:
-                        titulo = titulo_raw
-                        resumen = resumen_raw
+                    # Todo es nativo en español ahora gracias a los nuevos feeds de Marca y AS
+                    titulo = titulo_raw
+                    resumen = resumen_raw
                     
                     # Extraer imagen (ya sea de media_content o de links/enclosures)
                     imagen_url = None
