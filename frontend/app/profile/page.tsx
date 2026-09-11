@@ -143,7 +143,7 @@ export default function Profile() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {noticias.map((item: any) => (
-              <NewsCard key={item.id} item={item} initialSaved={true} />
+              <NewsCard key={item.id} item={item} defaultSaved={true} />
             ))}
           </div>
         )}

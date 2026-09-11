@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
+import AdBanner from '@/components/AdBanner';
+import { useState, useEffect } from "react";
 
 
 const getRowColor = (liga: string, pos: number, total: number) => {
@@ -341,6 +342,7 @@ export default function ClasificacionClient() {
 
                         {/* COLUMNA DERECHA: PARTIDOS (TEMPORADA) */}
             <aside className="lg:col-span-5 xl:col-span-5 flex flex-col gap-6">
+              <AdBanner dataAdSlot="clasificacion-top" />
               <div className="bg-gray-900 rounded-xl overflow-hidden border border-gray-800 shadow-xl relative">
                 {loading && <div className="absolute inset-0 bg-gray-950/80 flex items-center justify-center z-10"><div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div></div>}
                 
