@@ -150,28 +150,10 @@ def ingest_espn_feed(db):
                         print(f"Descartada por contener otra disciplina: {titulo_raw}")
                         continue
                         
-                    # Traducir si el feed no es en español
+                    # El frontend ahora se encarga de traducir nativamente con el widget de Google Translate
+                    # Así evitamos que el servidor Render colapse por timeouts (10+ minutos traduciendo)
                     titulo = titulo_raw
                     resumen = resumen_raw
-                    if source_lang != "spanish":
-                        import translators as ts
-                        try:
-                            # translator='bing' es más estable para servidores en la nube y no tiene límites duros
-                            titulo = ts.translate_text(titulo_raw, translator='bing', to_language='es')
-                            if len(resumen_raw) > 5 and len(resumen_raw) < 500:
-                                resumen = ts.translate_text(resumen_raw, translator='bing', to_language='es')
-                        except Exception as e:
-                            print(f"Error traduciendo con Bing: {e}")
-                            try:
-                                # Fallback a MyMemory por si acaso
-                                from deep_translator import MyMemoryTranslator
-                                translator = MyMemoryTranslator(source=source_lang, target='spanish', email='admin@maspot.com')
-                                titulo = translator.translate(titulo_raw)
-                                if len(resumen_raw) > 5 and len(resumen_raw) < 500:
-                                    resumen = translator.translate(resumen_raw)
-                            except Exception as e2:
-                                print(f"Error traduciendo con MyMemory fallback: {e2}")
-                                pass
                     
                     # Extraer imagen (ya sea de media_content o de links/enclosures o Bing)
                     imagen_url = None
