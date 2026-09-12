@@ -285,13 +285,14 @@ async def obtener_clasificacion(liga: str = "eng.1", jornada: int = 0):
             if isinstance(res_std, httpx.Response) and res_std.status_code == 200:
                 data_std = res_std.json()
                 if "children" in data_std and len(data_std["children"]) > 0:
+                    total_teams = sum(len(c.get("standings", {}).get("entries", [])) for c in data_std["children"])
+                    if total_teams > 0:
+                        matches_per_jornada = total_teams // 2
+                        
                     for idx, child in enumerate(data_std["children"]):
                         group_name = child.get("name", "Tabla")
                         group_entries = child.get("standings", {}).get("entries", [])
                           
-                        if idx == 0:
-                            matches_per_jornada = len(group_entries) // 2
-                              
                         group_posiciones = []
                         for e in group_entries:
                             stats = {s["abbreviation"]: s["displayValue"] for s in e.get("stats", [])}
