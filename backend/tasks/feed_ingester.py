@@ -66,18 +66,24 @@ def ingest_espn_feed(db):
         ],
         "Premier League": [
             ("https://e00-marca.uecdn.es/rss/futbol/premier-league.xml", "spanish"),
+            ("https://www.sport.es/es/rss/premier-league/rss.xml", "spanish"),
+            ("http://feeds.bbci.co.uk/sport/football/premier-league/rss.xml", "english"),
+            ("https://www.theguardian.com/football/premierleague/rss", "english"),
         ],
         "Serie A": [
             ("https://www.tuttosport.com/rss/calcio/serie-a", "italian"),
             ("https://e00-marca.uecdn.es/rss/futbol/liga-italiana.xml", "spanish"),
+            ("https://www.sport.es/es/rss/serie-a/rss.xml", "spanish"),
         ],
         "Bundesliga": [
             ("https://www.90min.de/posts.rss", "german"),
             ("https://e00-marca.uecdn.es/rss/futbol/bundesliga.xml", "spanish"),
+            ("https://www.sport.es/es/rss/bundesliga/rss.xml", "spanish"),
         ],
         "Ligue 1": [
             ("https://rmcsport.bfmtv.com/rss/football/ligue-1/", "french"),
             ("https://e00-marca.uecdn.es/rss/futbol/liga-francesa.xml", "spanish"),
+            ("https://www.sport.es/es/rss/ligue-1/rss.xml", "spanish"),
         ],
         "Liga Argentina": [
             ("https://www.tycsports.com/rss/liga-profesional-de-futbol.xml", "spanish"),
