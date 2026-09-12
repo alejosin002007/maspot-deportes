@@ -336,6 +336,20 @@ async def obtener_clasificacion(liga: str = "eng.1", jornada: int = 0):
             if isinstance(res_scb, httpx.Response) and res_scb.status_code == 200:
                 data_scb = res_scb.json()
                 events = data_scb.get("events", [])
+                
+                if events:
+                    # Filter to only the active season tournament to avoid mixing (e.g. Argentina Copa de la Liga + Liga Profesional)
+                    target_slug = None
+                    for e in events:
+                        if e.get("status", {}).get("type", {}).get("state") in ["in", "pre"]:
+                            target_slug = e.get("season", {}).get("slug")
+                            break
+                    if not target_slug and len(events) > 0:
+                        target_slug = events[-1].get("season", {}).get("slug")
+                        
+                    if target_slug:
+                        events = [e for e in events if e.get("season", {}).get("slug") == target_slug]
+
                 events = sorted(events, key=lambda x: x.get("date", ""))
                 
                 # Auto-advance matchday logic
