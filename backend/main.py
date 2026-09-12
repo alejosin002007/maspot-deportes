@@ -87,7 +87,7 @@ def obtener_noticias(q: Optional[str] = None, disciplina: Optional[str] = None, 
     if q:
         query = query.filter((models.Noticia.titulo.ilike(f"%{q}%")) | (models.Noticia.resumen.ilike(f"%{q}%")))
         
-    noticias_db = query.order_by(models.Noticia.id.desc()).limit(150).all()
+    noticias_db = query.order_by(models.Noticia.id.desc()).limit(600).all()
     
     if not disciplina and not q:
         grupos = { "Fútbol": [], "Básquetbol": [], "Fórmula 1": [], "Tenis": [], "Hockey": [], "Rugby": [] }
