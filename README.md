@@ -36,8 +36,8 @@ Sigue estos pasos para correr el proyecto en tu computadora local:
 
 ### 1. Clonar el repositorio
 ```bash
-git clone https://github.com/alejosin002007/maspot-deportes.git
-cd maspot-deportes
+git clone https://github.com/alejosin002007/maspot-futbol.git
+cd maspot-futbol
 ```
 
 ### 2. Levantar el Backend (API)
