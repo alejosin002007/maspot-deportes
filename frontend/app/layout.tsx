@@ -70,7 +70,7 @@ export default function RootLayout({
             </main>
           </div>
           
-          {/* Widget de Google Translate a petición del usuario */}
+          {/* Widget de Google Translate a petición del usuario (VERSIÓN MEJORADA) */}
           <div id="google_translate_element" style={{ display: 'none' }}></div>
           <Script id="google-translate-script" strategy="afterInteractive">
             {`
@@ -79,8 +79,17 @@ export default function RootLayout({
                   pageLanguage: 'auto', 
                   includedLanguages: 'es', 
                   layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-                  autoDisplay: false
+                  autoDisplay: true
                 }, 'google_translate_element');
+                
+                // Fuerza un retraso mínimo para asegurar que las noticias cargaron en el DOM
+                setTimeout(() => {
+                  const botonTraducir = document.querySelector('.goog-te-combo');
+                  if (botonTraducir) {
+                    botonTraducir.value = 'es';
+                    botonTraducir.dispatchEvent(new Event('change'));
+                  }
+                }, 1000);
               }
             `}
           </Script>

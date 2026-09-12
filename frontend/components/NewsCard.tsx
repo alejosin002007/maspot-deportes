@@ -6,11 +6,30 @@ import { Star } from "lucide-react";
 export default function NewsCard({ item, defaultSaved = false }: { item: any, defaultSaved?: boolean }) {
   const [isSaved, setIsSaved] = useState(defaultSaved);
   const [token, setToken] = useState<string | null>(null);
+  const [translatedTitle, setTranslatedTitle] = useState(item.title);
 
   useEffect(() => {
     setToken(localStorage.getItem("token"));
-    // Ideally we would sync with backend favorited state here
-  }, []);
+    
+    // Si la liga no es nativamente en español, usamos la alternativa profesional de Lingva
+    const ligasEspanol = ["La Liga", "Liga Argentina", "Internacional", "MLS"];
+    if (!ligasEspanol.includes(item.category) && item.title) {
+      const traducir = async () => {
+        try {
+          const res = await fetch(`https://lingva.ml/api/v1/auto/es/${encodeURIComponent(item.title)}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.translation) {
+              setTranslatedTitle(data.translation);
+            }
+          }
+        } catch (error) {
+          // Si falla, se queda el original
+        }
+      };
+      traducir();
+    }
+  }, [item.title, item.category]);
 
   const toggleSave = async (e: any) => {
     e.preventDefault();
@@ -41,7 +60,7 @@ export default function NewsCard({ item, defaultSaved = false }: { item: any, de
         </div>
         <div className="p-4 flex flex-col flex-1">
           <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-black uppercase tracking-widest mb-2">{item.category}</div>
-          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3 leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-3">{item.title}</h3>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3 leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-3">{translatedTitle}</h3>
           <div className="mt-auto pt-3 border-t border-gray-100 dark:border-[#144a2d] text-xs text-gray-400 dark:text-gray-500 font-medium flex items-center">
             <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             {item.time}
