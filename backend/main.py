@@ -342,6 +342,7 @@ async def obtener_clasificacion(liga: str = "eng.1", jornada: int = 0):
                                 if int(pj) > jornada_actual: jornada_actual = int(pj)
                             except: pass
                               
+                            team_name = e.get("team", {}).get("shortDisplayName")
                             team_id = e.get("team", {}).get("id")
                             # Obtener los 5 últimos resultados de la forma real, limitados (más recientes al final)
                             ultimas = real_form.get(team_id, [])[-5:]
