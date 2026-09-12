@@ -62,38 +62,43 @@ def ingest_espn_feed(db):
     feeds_by_league = {
         "La Liga": [
             ("https://e00-marca.uecdn.es/rss/futbol/primera-division.xml", "spanish"),
+            ("https://as.com/rss/futbol/primera.xml", "spanish"),
         ],
         "Premier League": [
-            ("https://e00-marca.uecdn.es/rss/futbol/premier-league.xml", "spanish")
+            ("https://e00-marca.uecdn.es/rss/futbol/premier-league.xml", "spanish"),
         ],
         "Serie A": [
-            ("https://www.tuttosport.com/rss/calcio/serie-a", "italian")
+            ("https://www.tuttosport.com/rss/calcio/serie-a", "italian"),
+            ("https://e00-marca.uecdn.es/rss/futbol/liga-italiana.xml", "spanish"),
         ],
         "Bundesliga": [
-            ("https://www.90min.de/posts.rss", "german")
+            ("https://www.90min.de/posts.rss", "german"),
+            ("https://e00-marca.uecdn.es/rss/futbol/bundesliga.xml", "spanish"),
         ],
         "Ligue 1": [
-            ("https://rmcsport.bfmtv.com/rss/football/ligue-1/", "french")
+            ("https://rmcsport.bfmtv.com/rss/football/ligue-1/", "french"),
+            ("https://e00-marca.uecdn.es/rss/futbol/liga-francesa.xml", "spanish"),
         ],
         "Liga Argentina": [
             ("https://www.tycsports.com/rss/liga-profesional-de-futbol.xml", "spanish"),
             ("https://www.ole.com.ar/rss/futbol-primera/", "spanish")
         ],
         "Brasileirao": [
-            ("https://e00-marca.uecdn.es/rss/futbol/america.xml", "spanish")
+            ("https://e00-marca.uecdn.es/rss/futbol/america.xml", "spanish"),
         ],
         "Primeira Liga": [
-            ("https://www.record.pt/rss", "portuguese")
+            ("https://www.record.pt/rss", "portuguese"),
         ],
         "MLS": [
-            ("https://e00-marca.uecdn.es/rss/futbol/estados-unidos.xml", "spanish")
+            ("https://e00-marca.uecdn.es/rss/futbol/estados-unidos.xml", "spanish"),
         ],
         "Eredivisie": [
-            ("https://www.voetbalprimeur.nl/rss/", "dutch")
+            ("https://www.voetbalprimeur.nl/rss/", "dutch"),
         ],
         "Internacional": [
             ("https://e00-marca.uecdn.es/rss/futbol/seleccion.xml", "spanish"),
-            ("https://www.ole.com.ar/rss/futbol-internacional/", "spanish")
+            ("https://www.ole.com.ar/rss/futbol-internacional/", "spanish"),
+            ("https://as.com/rss/futbol/internacional.xml", "spanish"),
         ]
     }
     now = time.time()
