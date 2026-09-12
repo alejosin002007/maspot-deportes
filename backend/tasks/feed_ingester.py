@@ -59,47 +59,44 @@ def ingest_espn_feed(db):
         "motogp", "motos", "pole", "gasly", "ciclismo", "piloto", "escuderia", "red bull", "mercedes", "ferrari", "verstappen", "hamilton", "sainz"
     ]
 
-    
     feeds_by_league = {
         "La Liga": [
-            "https://e00-marca.uecdn.es/rss/futbol/primera-division.xml",
+            ("https://e00-marca.uecdn.es/rss/futbol/primera-division.xml", "spanish"),
         ],
         "Premier League": [
-            "https://e00-marca.uecdn.es/rss/futbol/premier-league.xml"
+            ("https://e00-marca.uecdn.es/rss/futbol/premier-league.xml", "spanish"),
+            ("https://www.skysports.com/rss/12040", "english")
         ],
         "Serie A": [
-            "https://www.bing.com/news/search?q=Serie+A+Italia+futbol&format=rss&setlang=es"
+            ("https://www.tuttosport.com/rss/calcio/serie-a", "italian")
         ],
         "Bundesliga": [
-            "https://www.bing.com/news/search?q=Bundesliga+Alemania+futbol&format=rss&setlang=es"
+            ("https://www.90min.de/posts.rss", "german")
         ],
         "Ligue 1": [
-            "https://www.bing.com/news/search?q=Ligue+1+Francia+futbol&format=rss&setlang=es"
+            ("https://rmcsport.bfmtv.com/rss/football/ligue-1/", "french")
         ],
         "Liga Argentina": [
-            "https://www.tycsports.com/rss/liga-profesional-de-futbol.xml",
-            "https://www.ole.com.ar/rss/futbol-primera/"
+            ("https://www.tycsports.com/rss/liga-profesional-de-futbol.xml", "spanish"),
+            ("https://www.ole.com.ar/rss/futbol-primera/", "spanish")
         ],
         "Brasileirao": [
-            "https://e00-marca.uecdn.es/rss/futbol/america.xml"
+            ("https://e00-marca.uecdn.es/rss/futbol/america.xml", "spanish")
         ],
         "Primeira Liga": [
-            "https://www.bing.com/news/search?q=Primeira+Liga+Portugal+futbol&format=rss&setlang=es"
+            ("https://www.record.pt/rss", "portuguese")
         ],
         "MLS": [
-            "https://www.bing.com/news/search?q=MLS+futbol+Inter+Miami&format=rss&setlang=es",
-            "https://e00-marca.uecdn.es/rss/futbol/estados-unidos.xml"
+            ("https://e00-marca.uecdn.es/rss/futbol/estados-unidos.xml", "spanish")
         ],
         "Eredivisie": [
-            "https://www.bing.com/news/search?q=Eredivisie+Holanda+futbol&format=rss&setlang=es"
+            ("https://www.voetbalprimeur.nl/rss/", "dutch")
         ],
         "Internacional": [
-            "https://e00-marca.uecdn.es/rss/futbol/seleccion.xml",
-            "https://www.ole.com.ar/rss/futbol-internacional/"
+            ("https://e00-marca.uecdn.es/rss/futbol/seleccion.xml", "spanish"),
+            ("https://www.ole.com.ar/rss/futbol-internacional/", "spanish")
         ]
     }
-    
-    nuevas = 0
     now = time.time()
     
     # Palabras clave prohibidas (otros deportes)
@@ -108,10 +105,13 @@ def ingest_espn_feed(db):
         "colapinto", "pumas", "alcaraz", "djokovic", "sinner", "cerundolo", "nadal", "sabalenka", "fritz",
         "motogp", "motos", "pole", "gasly", "ciclismo", "piloto", "escuderia", "red bull", "mercedes", "ferrari", "verstappen", "hamilton", "sainz"
     ]
-
     
-    for league, feed_urls in feeds_by_league.items():
-        for feed_url in feed_urls:
+    from deep_translator import MyMemoryTranslator
+    
+    nuevas = 0
+    
+    for league, feed_list in feeds_by_league.items():
+        for feed_url, source_lang in feed_list:
             try:
                 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
                 res = requests.get(feed_url, headers=headers, timeout=10)
@@ -151,9 +151,18 @@ def ingest_espn_feed(db):
                         print(f"Descartada por contener otra disciplina: {titulo_raw}")
                         continue
                         
-                    # Todo es nativo en español ahora gracias a los nuevos feeds de Marca y AS
+                    # Traducir si el feed no es en español
                     titulo = titulo_raw
                     resumen = resumen_raw
+                    if source_lang != "spanish":
+                        try:
+                            translator = MyMemoryTranslator(source=source_lang, target='spanish', email='test@test.com')
+                            titulo = translator.translate(titulo_raw)
+                            if len(resumen_raw) > 5 and len(resumen_raw) < 500:  # Evitar traducir resúmenes gigantes
+                                resumen = translator.translate(resumen_raw)
+                        except Exception as e:
+                            print(f"Error traduciendo: {e}")
+                            pass
                     
                     # Extraer imagen (ya sea de media_content o de links/enclosures o Bing)
                     imagen_url = None
