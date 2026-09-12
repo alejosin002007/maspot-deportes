@@ -180,10 +180,10 @@ export default function ClasificacionClient() {
       ) : (
         <div className="flex flex-col gap-8">
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8">
+          <div className="flex flex-col gap-6 xl:gap-8 w-full">
             
             {/* COLUMNA IZQUIERDA: TABLA Y ESTADISTICAS */}
-            <div className="lg:col-span-7 xl:col-span-7 flex flex-col">
+            <div className="w-full flex flex-col">
 {/* COLUMNA CENTRO: TABLA DE POSICIONES */}
               
               {data.grupos && data.grupos.length > 0 ? (
@@ -340,9 +340,8 @@ export default function ClasificacionClient() {
 
                         </div>
 
-                        {/* COLUMNA DERECHA: PARTIDOS (TEMPORADA) */}
-            <aside className="lg:col-span-5 xl:col-span-5 flex flex-col gap-6">
-              <AdBanner dataAdSlot="clasificacion-top" />
+            {/* COLUMNA DERECHA: PARTIDOS (TEMPORADA) */}
+            <aside className="w-full flex flex-col gap-6">
               <div className="bg-gray-900 rounded-xl overflow-hidden border border-gray-800 shadow-xl relative">
                 {loading && <div className="absolute inset-0 bg-gray-950/80 flex items-center justify-center z-10"><div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div></div>}
                 
@@ -393,6 +392,11 @@ export default function ClasificacionClient() {
                   </div>
               </div>
             </aside>
+            
+            {/* PUBLICIDAD INFERIOR A ANCHO COMPLETO */}
+            <div className="w-full mt-8 flex justify-center">
+              <AdBanner dataAdSlot="clasificacion-bottom" />
+            </div>
 
           </div>
         </div>
