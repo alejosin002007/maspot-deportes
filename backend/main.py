@@ -135,8 +135,11 @@ import requests
 import httpx
 import asyncio
 
-async def fetch_league(client, league_code, nombre_liga):
+async def fetch_league(client, league_code, nombre_liga, date_str=None):
     url = f"https://site.api.espn.com/apis/site/v2/sports/soccer/{league_code}/scoreboard"
+    if date_str:
+        url += f"?dates={date_str}"
+        
     try:
         resp = await client.get(url, timeout=5)
         if resp.status_code == 200:
@@ -146,7 +149,7 @@ async def fetch_league(client, league_code, nombre_liga):
     return nombre_liga, None
 
 @app.get("/api/resultados")
-async def obtener_resultados():
+async def obtener_resultados(date: Optional[str] = None):
     """
     Retorna resultados deportivos REALES y en VIVO (Fútbol) usando la API pública de ESPN, 
     consultando ligas específicas concurrentemente.
@@ -172,7 +175,7 @@ async def obtener_resultados():
     
     try:
         async with httpx.AsyncClient() as client:
-            tasks = [fetch_league(client, code, name) for code, name in leagues_to_fetch]
+            tasks = [fetch_league(client, code, name, date) for code, name in leagues_to_fetch]
             responses = await asyncio.gather(*tasks)
             
             for nombre_liga, data in responses:
