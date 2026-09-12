@@ -1,6 +1,6 @@
-# ⚽ Maspot Deportes - Agregador Deportivo Inteligente
+# ⚽ Masport Fútbol - Agregador Deportivo Inteligente
 
-Maspot Deportes es una plataforma web moderna que centraliza resultados en tiempo real, tablas de posiciones y noticias deportivas internacionales. Utiliza Inteligencia Artificial para procesar, clasificar y traducir automáticamente grandes volúmenes de información en un ecosistema unificado, limpio y libre de distracciones.
+Masport Fútbol es una plataforma web moderna que centraliza resultados en tiempo real, tablas de posiciones y noticias deportivas internacionales. Utiliza Inteligencia Artificial para procesar, clasificar y traducir automáticamente grandes volúmenes de información en un ecosistema unificado, limpio y libre de distracciones.
 
 ## 🚀 Características Principales
 
@@ -27,7 +27,7 @@ Maspot Deportes es una plataforma web moderna que centraliza resultados en tiemp
 
 El repositorio está dividido en dos grandes bloques:
 
-* `/backend`: Contiene la API REST en Python. Aquí corre el *Cron Job* (`feed_ingester.py`) que recolecta las noticias periódicamente, las clasifica usando OpenAI y las guarda en la base de datos `deportes.db`.
+* `/backend`: Contiene la API REST en Python. Aquí corre el *Cron Job* (`feed_ingester.py`) que recolecta las noticias periódicamente, las clasifica usando OpenAI y las guarda en la base de datos local.
 * `/frontend`: Contiene la aplicación web de Next.js. Se encarga del renderizado de la UI, la traducción dinámica y la visualización de datos consumidos de nuestro Backend y de ESPN.
 
 ## ⚙️ Instalación y Uso Local
@@ -36,7 +36,7 @@ Sigue estos pasos para correr el proyecto en tu computadora local:
 
 ### 1. Clonar el repositorio
 ```bash
-git clone https://github.com/tu-usuario/maspot-deportes.git
+git clone https://github.com/alejosin002007/maspot-deportes.git
 cd maspot-deportes
 ```
 
