@@ -282,6 +282,47 @@ async def obtener_clasificacion(liga: str = "eng.1", jornada: int = 0):
                 return_exceptions=True
             )
             
+            real_form = {}
+            events_data = []
+            if isinstance(res_scb, httpx.Response) and res_scb.status_code == 200:
+                data_scb = res_scb.json()
+                events = data_scb.get("events", [])
+                if events:
+                    target_slug = None
+                    for e in events:
+                        if e.get("status", {}).get("type", {}).get("state") in ["in", "pre"]:
+                            target_slug = e.get("season", {}).get("slug")
+                            break
+                    if not target_slug and len(events) > 0:
+                        target_slug = events[-1].get("season", {}).get("slug")
+                    if target_slug:
+                        events = [e for e in events if e.get("season", {}).get("slug") == target_slug]
+                        
+                    events_data = sorted(events, key=lambda x: x.get("date", ""))
+                    for ev in events_data:
+                        if ev.get("status", {}).get("type", {}).get("state") == "post":
+                            comp = ev.get("competitions", [{}])[0]
+                            competitors = comp.get("competitors", [])
+                            if len(competitors) == 2:
+                                c1, c2 = competitors[0], competitors[1]
+                                t1 = c1.get("team", {}).get("shortDisplayName")
+                                t2 = c2.get("team", {}).get("shortDisplayName")
+                                s1 = int(c1.get("score", "0"))
+                                s2 = int(c2.get("score", "0"))
+                                
+                                if t1 not in real_form: real_form[t1] = []
+                                if t2 not in real_form: real_form[t2] = []
+                                
+                                if s1 > s2:
+                                    real_form[t1].append("V")
+                                    real_form[t2].append("D")
+                                elif s2 > s1:
+                                    real_form[t2].append("V")
+                                    real_form[t1].append("D")
+                                else:
+                                    real_form[t1].append("E")
+                                    real_form[t2].append("E")
+              
             if isinstance(res_std, httpx.Response) and res_std.status_code == 200:
                 data_std = res_std.json()
                 if "children" in data_std and len(data_std["children"]) > 0:
@@ -301,16 +342,13 @@ async def obtener_clasificacion(liga: str = "eng.1", jornada: int = 0):
                                 if int(pj) > jornada_actual: jornada_actual = int(pj)
                             except: pass
                               
-                            import hashlib
-                            def get_stable_form(t_name):
-                                h = hashlib.md5(t_name.encode()).hexdigest()
-                                choices = ["V", "E", "D"]
-                                return [choices[int(h[i], 16) % 3] for i in range(5)]
-                            ultimas = get_stable_form(e["team"]["shortDisplayName"])
+                            team_name = e["team"]["shortDisplayName"]
+                            # Obtener los 5 últimos resultados de la forma real, invertidos y limitados (más recientes al final)
+                            ultimas = real_form.get(team_name, [])[-5:]
                               
                             team_dict = {
                                 "rank": stats.get("R", ""),
-                                "team": e["team"]["shortDisplayName"],
+                                "team": team_name,
                                 "logo": e["team"]["logos"][0]["href"] if "logos" in e["team"] else "",
                                 "pts": stats.get("P", ""),
                                 "pj": pj,
@@ -335,23 +373,7 @@ async def obtener_clasificacion(liga: str = "eng.1", jornada: int = 0):
                             "posiciones": group_posiciones
                         })
             if isinstance(res_scb, httpx.Response) and res_scb.status_code == 200:
-                data_scb = res_scb.json()
-                events = data_scb.get("events", [])
-                
-                if events:
-                    # Filter to only the active season tournament to avoid mixing (e.g. Argentina Copa de la Liga + Liga Profesional)
-                    target_slug = None
-                    for e in events:
-                        if e.get("status", {}).get("type", {}).get("state") in ["in", "pre"]:
-                            target_slug = e.get("season", {}).get("slug")
-                            break
-                    if not target_slug and len(events) > 0:
-                        target_slug = events[-1].get("season", {}).get("slug")
-                        
-                    if target_slug:
-                        events = [e for e in events if e.get("season", {}).get("slug") == target_slug]
-
-                events = sorted(events, key=lambda x: x.get("date", ""))
+                events = events_data  # Usamos la lista de eventos ya parseada y filtrada arriba
                 
                 # Auto-advance matchday logic
                 if jornada <= 0:
