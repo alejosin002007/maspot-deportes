@@ -86,37 +86,9 @@ def obtener_noticias(q: Optional[str] = None, disciplina: Optional[str] = None, 
         query = query.filter(models.Noticia.disciplina == disciplina)
     if q:
         query = query.filter((models.Noticia.titulo.ilike(f"%{q}%")) | (models.Noticia.resumen.ilike(f"%{q}%")))
-        
-    noticias_db = query.order_by(models.Noticia.id.desc()).limit(600).all()
-    
-    if not disciplina and not q:
-        grupos = { "Fútbol": [], "Básquetbol": [], "Fórmula 1": [], "Tenis": [], "Hockey": [], "Rugby": [] }
-        otros = []
-        for n in noticias_db:
-            if n.disciplina in grupos:
-                grupos[n.disciplina].append(n)
-            else:
-                otros.append(n)
-                
-        mezcla = []
-        while any(grupos.values()) or otros:
-            for _ in range(4):
-                if grupos["Fútbol"]: mezcla.append(grupos["Fútbol"].pop(0))
-            for _ in range(2):
-                if grupos["Básquetbol"]: mezcla.append(grupos["Básquetbol"].pop(0))
-                if grupos["Fórmula 1"]: mezcla.append(grupos["Fórmula 1"].pop(0))
-                if grupos["Tenis"]: mezcla.append(grupos["Tenis"].pop(0))
-            if grupos["Hockey"]: mezcla.append(grupos["Hockey"].pop(0))
-            if grupos["Rugby"]: mezcla.append(grupos["Rugby"].pop(0))
-            if otros: mezcla.append(otros.pop(0))
-            
-            # Romper si solo queda 'otros' o todo vacío
-            if not any(grupos.values()):
-                mezcla.extend(otros)
-                break
-        noticias_db = mezcla[:150]
-    else:
-        noticias_db = noticias_db[:150]
+
+    # Ordenamos estrictamente por fecha descendente para que aparezcan cronológicamente
+    noticias_db = query.order_by(models.Noticia.fecha.desc()).limit(600).all()
 
     formatted_news = []
     for n in noticias_db:
