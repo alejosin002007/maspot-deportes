@@ -69,6 +69,23 @@ export default function RootLayout({
               {children}
             </main>
           </div>
+          
+          {/* Widget de Google Translate a petición del usuario */}
+          <div id="google_translate_element" style={{ display: 'none' }}></div>
+          <Script id="google-translate-script" strategy="afterInteractive">
+            {`
+              function googleTranslateElementInit() {
+                new google.translate.TranslateElement({
+                  pageLanguage: 'auto', 
+                  includedLanguages: 'es', 
+                  layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                  autoDisplay: false
+                }, 'google_translate_element');
+              }
+            `}
+          </Script>
+          <Script strategy="afterInteractive" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" />
+          
         </ThemeProvider>
       </body>
     </html>
