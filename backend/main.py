@@ -305,23 +305,23 @@ async def obtener_clasificacion(liga: str = "eng.1", jornada: int = 0):
                             competitors = comp.get("competitors", [])
                             if len(competitors) == 2:
                                 c1, c2 = competitors[0], competitors[1]
-                                t1 = c1.get("team", {}).get("shortDisplayName")
-                                t2 = c2.get("team", {}).get("shortDisplayName")
+                                t1_id = c1.get("team", {}).get("id")
+                                t2_id = c2.get("team", {}).get("id")
                                 s1 = int(c1.get("score", "0"))
                                 s2 = int(c2.get("score", "0"))
                                 
-                                if t1 not in real_form: real_form[t1] = []
-                                if t2 not in real_form: real_form[t2] = []
+                                if t1_id not in real_form: real_form[t1_id] = []
+                                if t2_id not in real_form: real_form[t2_id] = []
                                 
                                 if s1 > s2:
-                                    real_form[t1].append("V")
-                                    real_form[t2].append("D")
+                                    real_form[t1_id].append("V")
+                                    real_form[t2_id].append("D")
                                 elif s2 > s1:
-                                    real_form[t2].append("V")
-                                    real_form[t1].append("D")
+                                    real_form[t2_id].append("V")
+                                    real_form[t1_id].append("D")
                                 else:
-                                    real_form[t1].append("E")
-                                    real_form[t2].append("E")
+                                    real_form[t1_id].append("E")
+                                    real_form[t2_id].append("E")
               
             if isinstance(res_std, httpx.Response) and res_std.status_code == 200:
                 data_std = res_std.json()
@@ -342,9 +342,9 @@ async def obtener_clasificacion(liga: str = "eng.1", jornada: int = 0):
                                 if int(pj) > jornada_actual: jornada_actual = int(pj)
                             except: pass
                               
-                            team_name = e["team"]["shortDisplayName"]
-                            # Obtener los 5 últimos resultados de la forma real, invertidos y limitados (más recientes al final)
-                            ultimas = real_form.get(team_name, [])[-5:]
+                            team_id = e.get("team", {}).get("id")
+                            # Obtener los 5 últimos resultados de la forma real, limitados (más recientes al final)
+                            ultimas = real_form.get(team_id, [])[-5:]
                               
                             team_dict = {
                                 "rank": stats.get("R", ""),
