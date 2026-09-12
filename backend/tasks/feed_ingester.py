@@ -68,13 +68,13 @@ def ingest_espn_feed(db):
             "https://e00-marca.uecdn.es/rss/futbol/premier-league.xml"
         ],
         "Serie A": [
-            "https://e00-marca.uecdn.es/rss/futbol/serie-a.xml"
+            "https://www.bing.com/news/search?q=Serie+A+Italia+futbol&format=rss&setlang=es"
         ],
         "Bundesliga": [
-            "https://e00-marca.uecdn.es/rss/futbol/bundesliga.xml"
+            "https://www.bing.com/news/search?q=Bundesliga+Alemania+futbol&format=rss&setlang=es"
         ],
         "Ligue 1": [
-            "https://e00-marca.uecdn.es/rss/futbol/ligue-1.xml"
+            "https://www.bing.com/news/search?q=Ligue+1+Francia+futbol&format=rss&setlang=es"
         ],
         "Liga Argentina": [
             "https://www.tycsports.com/rss/liga-profesional-de-futbol.xml",
@@ -84,13 +84,14 @@ def ingest_espn_feed(db):
             "https://e00-marca.uecdn.es/rss/futbol/america.xml"
         ],
         "Primeira Liga": [
-            "https://e00-marca.uecdn.es/rss/futbol/futbol-internacional.xml"
+            "https://www.bing.com/news/search?q=Primeira+Liga+Portugal+futbol&format=rss&setlang=es"
         ],
         "MLS": [
+            "https://www.bing.com/news/search?q=MLS+futbol+Inter+Miami&format=rss&setlang=es",
             "https://e00-marca.uecdn.es/rss/futbol/estados-unidos.xml"
         ],
         "Eredivisie": [
-            "https://as.com/rss/futbol/internacional.xml"
+            "https://www.bing.com/news/search?q=Eredivisie+Holanda+futbol&format=rss&setlang=es"
         ],
         "Internacional": [
             "https://e00-marca.uecdn.es/rss/futbol/seleccion.xml",
@@ -154,9 +155,11 @@ def ingest_espn_feed(db):
                     titulo = titulo_raw
                     resumen = resumen_raw
                     
-                    # Extraer imagen (ya sea de media_content o de links/enclosures)
+                    # Extraer imagen (ya sea de media_content o de links/enclosures o Bing)
                     imagen_url = None
-                    if 'media_content' in entry and len(entry.media_content) > 0:
+                    if 'news_image' in entry:
+                        imagen_url = entry.news_image
+                    elif 'media_content' in entry and len(entry.media_content) > 0:
                         imagen_url = entry.media_content[0].get('url')
                     elif 'links' in entry:
                         for l in entry.links:
@@ -164,11 +167,21 @@ def ingest_espn_feed(db):
                                 imagen_url = l.get('href')
                                 break
                                 
-                    # Si el RSS no trae la imagen, la resolvemos de la pagina
+                    final_url = link
                     if not imagen_url:
                         print(f"Resolviendo URL final e imagen para: {link}")
-                    # Extraer imagen y resolver URL
-                    imagen_url, final_url = resolve_url_and_image(link)
+                        img_tmp, final_url = resolve_url_and_image(link)
+                        if img_tmp:
+                            imagen_url = img_tmp
+                    else:
+                        if "bing.com/news/apiclick.aspx" in link:
+                            import urllib.parse
+                            parsed = urllib.parse.urlparse(link)
+                            qs = urllib.parse.parse_qs(parsed.query)
+                            if 'url' in qs:
+                                final_url = qs['url'][0]
+                        pass
+                        
                     link = final_url # Actualizar al enlace real
                     
                     try:
