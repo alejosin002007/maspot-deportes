@@ -44,21 +44,21 @@ export default function RootLayout({
           {/* Main Content */}
           <div className="flex-1 flex flex-col h-full overflow-hidden">
             {/* Header */}
-            <header className="h-16 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-[#144a2d] flex items-center justify-between px-8 shrink-0 shadow-sm">
-              <div className="flex-1 flex items-center">
-                <div className="text-xl font-bold dark:text-white tracking-tight">Noticias</div>
+            <header className="h-16 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-[#144a2d] flex items-center justify-between px-4 md:px-8 shrink-0 shadow-sm gap-2">
+              <div className="flex items-center gap-2 md:flex-1">
+                <div className="hidden md:block text-xl font-bold dark:text-white tracking-tight mr-4">Noticias</div>
+                <Link href="/clasificacion" className="px-3 md:px-7 py-2 md:py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-full text-sm md:text-base font-black hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 transition-all shadow-md transform hover:scale-105 whitespace-nowrap flex items-center gap-1">
+                  📊 <span className="hidden sm:inline">Tablas</span>
+                </Link>
               </div>
               
-              <div className="flex-1 flex justify-center max-w-lg w-full">
-                <Suspense fallback={<div className="w-full max-w-md h-10 bg-gray-100 dark:bg-gray-700 rounded-full animate-pulse"></div>}>
+              <div className="flex-1 flex justify-center w-full max-w-lg mx-1 md:mx-4">
+                <Suspense fallback={<div className="w-full h-10 bg-gray-100 dark:bg-gray-700 rounded-full animate-pulse"></div>}>
                   <SearchBar />
                 </Suspense>
               </div>
               
-              <div className="flex-1 flex items-center justify-end gap-4">
-                <Link href="/clasificacion" className="px-7 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-full text-base font-black hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 transition-all shadow-md transform hover:scale-105">
-                  🏆 Tablas
-                </Link>
+              <div className="flex items-center justify-end gap-2 md:flex-1">
                 <ThemeToggle />
                 <UserAvatar />
               </div>
