@@ -1,4 +1,4 @@
-# ⚽ Masport Fútbol - Agregador Deportivo Inteligente
+# ⚽ Maspot Fútbol - Agregador Deportivo Inteligente
 
 Masport Fútbol es una plataforma web moderna que centraliza resultados en tiempo real, tablas de posiciones y noticias deportivas internacionales. Utiliza Inteligencia Artificial para procesar, clasificar y traducir automáticamente grandes volúmenes de información en un ecosistema unificado, limpio y libre de distracciones.
 
